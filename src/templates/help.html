@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Guide - Marketing Agent</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f2f5; display: flex; height: 100vh; }
+        .sidebar { width: 250px; background: #fff; border-right: 1px solid #ddd; padding: 20px; display: flex; flex-direction: column; }
+        .sidebar h2 { color: #333; margin-top: 0; }
+        .nav-link { 
+            display: block; padding: 10px 15px; margin-bottom: 5px; 
+            text-decoration: none; color: #555; border-radius: 5px; 
+            transition: background 0.2s;
+        }
+        .nav-link:hover, .nav-link.active { background: #e6f0ff; color: #007bff; }
+
+        .container {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto; 
+        }
+        .card { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 900px; margin-bottom: 20px; }
+        
+        h1 { margin-top: 0; margin-bottom: 10px; color: #333; }
+        h2 { color: #007bff; margin-top: 30px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #007bff; }
+        h3 { color: #555; margin-top: 20px; margin-bottom: 10px; }
+        
+        .intro { 
+            background: #fff3cd; 
+            border-left: 4px solid #ffc107; 
+            padding: 15px; 
+            margin-bottom: 30px; 
+            border-radius: 4px;
+        }
+        
+        .method-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .method-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .official { background: #d4edda; color: #155724; }
+        .unofficial { background: #fff3cd; color: #856404; }
+        .recommended { background: #d1ecf1; color: #0c5460; }
+        
+        ol, ul { line-height: 1.8; }
+        li { margin-bottom: 10px; }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+            color: #e83e8c;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', monospace;
+        }
+        
+        .warning {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #721c24;
+        }
+        
+        .note {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #0c5460;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #155724;
+        }
+        
+        .step {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        
+        .btn-primary {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+            text-decoration: none;
+        }
+        
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .toc h3 { margin-top: 0; }
+        .toc ul { margin: 0; padding-left: 20px; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Marketing AI</h2>
+        <a href="/" class="nav-link">Dashboard</a>
+        <a href="/editor" class="nav-link">Editor</a>
+        <a href="/gallery" class="nav-link">Gallery</a>
+        <a href="/settings" class="nav-link">Settings</a>
+        <a href="/logs" class="nav-link">Server Logs</a>
+        <a href="/about" class="nav-link">About / Docs</a>
+        <a href="/about" class="nav-link">About / Docs</a>
+        <a href="/help" class="nav-link active">Setup Guide</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h1>🚀 Social Media Integration Setup Guide</h1>
+            
+            <div class="intro">
+                <strong>Welcome!</strong> This guide will walk you through connecting your social media accounts to the Marketing AI Agent. Follow the platform-specific instructions below to obtain the necessary credentials.
+            </div>
+
+            <div class="toc">
+                <h3>Quick Navigation</h3>
+                <ul>
+                    <li><a href="#instagram">Instagram Setup</a></li>
+                    <li><a href="#facebook">Facebook Setup</a></li>
+                    <li><a href="#tiktok">TikTok Setup</a></li>
+                    <li><a href="#testing">Testing Your Configuration</a></li>
+                </ul>
+            </div>
+
+            <!-- Instagram Section -->
+            <h2 id="instagram">📸 Instagram Configuration</h2>
+            
+            <div class="note">
+                <strong>Important:</strong> Instagram has two integration methods. The official API is recommended for business accounts, while the unofficial method works for personal accounts but carries more risk.
+            </div>
+
+            <div class="method-card">
+                <h3>Method 1: Instagram Graph API <span class="method-badge official">OFFICIAL</span> <span class="method-badge recommended">RECOMMENDED</span></h3>
+                
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                    <li>Instagram Business or Creator account</li>
+                    <li>Facebook Page connected to your Instagram account</li>
+                    <li>Facebook Developer account</li>
+                </ul>
+
+                <p><strong>Step-by-Step Instructions:</strong></p>
+                
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>Convert to Business Account</strong>
+                    <ul>
+                        <li>Open Instagram app → Go to Profile</li>
+                        <li>Tap menu (☰) → Settings → Account</li>
+                        <li>Tap "Switch to Professional Account"</li>
+                        <li>Choose "Business" or "Creator"</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>Connect to Facebook Page</strong>
+                    <ul>
+                        <li>In Instagram settings → Business → Linked Accounts</li>
+                        <li>Tap Facebook and connect your page</li>
+                        <li>If you don't have a page, create one at <a href="https://www.facebook.com/pages/create" target="_blank">facebook.com/pages/create</a></li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>Create Facebook App</strong>
+                    <ul>
+                        <li>Go to <a href="https://developers.facebook.com/apps/" target="_blank">Meta for Developers > My Apps</a></li>
+                        <li>Click "Create App" → Select "Business" type</li>
+                        <li>Fill in app details and create.</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>Add Products</strong>
+                    <ul>
+                        <li>In your app dashboard, find "Instagram Graph API" and click "Set Up".</li>
+                        <li>(Optional) Add "Facebook Login for Business" if asked, but Graph API is the key one.</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <strong>Generate Access Token</strong>
+                    <ul>
+                        <li>Go to <a href="https://developers.facebook.com/tools/explorer/" target="_blank">Graph API Explorer</a></li>
+                        <li>Select your App from the "Meta App" dropdown.</li>
+                        <li><strong>Crucial:</strong> Change "User or Page" dropdown to <strong>"Get Page Access Token"</strong>.</li>
+                        <li>Select your Facebook Page.</li>
+                        <li>Add permissions: <code>instagram_basic</code>, <code>instagram_content_publish</code>, <code>pages_read_engagement</code>, <code>pages_manage_posts</code></li>
+                        <li>Click "Generate Access Token".</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">6</span>
+                    <strong>Get Instagram Business Account ID</strong>
+                    <ul>
+                        <li>In the Graph API Explorer query box, enter: <code>me?fields=instagram_business_account</code></li>
+                        <li>Click "Submit".</li>
+                        <li>Copy the ID from the response (inside <code>instagram_business_account: { id: "..." }</code>).</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">7</span>
+                    <strong>Extend Token (Recommended)</strong>
+                    <ul>
+                        <li>Click the "i" info icon next to your token in the Explorer.</li>
+                        <li>Click "Open in Access Token Tool".</li>
+                        <li>Click "Extend Access Token" to get a 60-day token.</li>
+                    </ul>
+                </div>
+
+                <div class="success">
+                    ✅ Paste the <strong>Access Token</strong> in the "Facebook Access Token" field.<br>
+                    ✅ Paste the <strong>Business Account ID</strong> in the "Instagram Business Account ID" field.
+                </div>
+            </div>
+
+            <div class="method-card">
+                <h3>Method 2: Username & Password <span class="method-badge unofficial">UNOFFICIAL</span></h3>
+                
+                <div class="warning">
+                    <strong>⚠️ Warning:</strong> This method uses unofficial APIs and may violate Instagram's Terms of Service. Your account could be banned or suspended. Use at your own risk!
+                </div>
+
+                <p>This method requires installing additional libraries like <code>instagrapi</code>:</p>
+                <div class="code-block">pip install instagrapi</div>
+
+                <p><strong>To use this method:</strong></p>
+                <ol>
+                    <li>Enter your Instagram username in the <strong>Instagram Username</strong> field</li>
+                    <li>Enter your Instagram password in the <strong>Instagram Password</strong> field</li>
+                    <li>Save configuration</li>
+                </ol>
+
+                <div class="note">
+                    <strong>Note:</strong> This method is currently stored but not implemented in the code. If you want to use it, the developer needs to integrate the <code>instagrapi</code> library into the publisher module.
+                </div>
+            </div>
+
+            <!-- Facebook Section -->
+            <h2 id="facebook">👍 Facebook Configuration</h2>
+
+            <div class="method-card">
+                <h3>Facebook Page Access Token <span class="method-badge official">OFFICIAL</span></h3>
+                
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                    <li>Facebook Page (not personal profile)</li>
+                    <li>Facebook Developer account</li>
+                    <li>Page admin access</li>
+                </ul>
+
+                <div class="note">
+                    <strong>Tip:</strong> If you already set up the <strong>Instagram Graph API</strong> (Method 1) above, you can use the <strong>same Access Token</strong>! Just ensure you added the <code>publish_video</code> permission to it. You don't need a separate token.
+                </div>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>Create or Access Your Facebook Page</strong>
+                    <ul>
+                        <li>Go to <a href="https://www.facebook.com/pages" target="_blank">facebook.com/pages</a></li>
+                        <li>Create a new page or select an existing one</li>
+                        <li>Ensure you are an admin of the page</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>Create Facebook App (if not already done)</strong>
+                    <ul>
+                        <li>Go to <a href="https://developers.facebook.com/" target="_blank">developers.facebook.com</a></li>
+                        <li>Click "My Apps" → "Create App"</li>
+                        <li>Choose "Business" type</li>
+                        <li>Fill in details and create</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>Add Required Products</strong>
+                    <ul>
+                        <li>In app dashboard, add "Facebook Login"</li>
+                        <li>Add "Graph API" if not already added</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>Generate Page Access Token</strong>
+                    <ul>
+                        <li>Go to Tools → <a href="https://developers.facebook.com/tools/explorer/" target="_blank">Graph API Explorer</a></li>
+                        <li>Select your app from the dropdown</li>
+                        <li>Click "Get Token" → "Get Page Access Token"</li>
+                        <li>Select your page and authorize</li>
+                        <li>Add permissions: <code>pages_manage_posts</code>, <code>pages_read_engagement</code>, <code>publish_video</code></li>
+                        <li>Copy the generated token</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <strong>Make Token Long-Lived (Recommended)</strong>
+                    <ul>
+                        <li>Go to <a href="https://developers.facebook.com/tools/debug/accesstoken/" target="_blank">Access Token Debugger</a></li>
+                        <li>Paste your token and click "Debug"</li>
+                        <li>Click "Extend Access Token" to get a 60-day token</li>
+                        <li>Copy the new extended token</li>
+                    </ul>
+                </div>
+
+                <div class="success">
+                    ✅ Paste the Page Access Token in the <strong>Facebook Access Token</strong> field on the Settings page.
+                    <br><br>
+                    💡 <strong>Tip:</strong> After saving, use the "Test token" button to verify it works!
+                </div>
+            </div>
+
+            <div class="note">
+                <strong>Token Permissions Required:</strong>
+                <ul style="margin: 10px 0 0 0;">
+                    <li><code>pages_manage_posts</code> - Publish posts to your page</li>
+                    <li><code>pages_read_engagement</code> - Read engagement metrics</li>
+                    <li><code>publish_video</code> - Upload video content</li>
+                </ul>
+            </div>
+
+            <!-- TikTok Section -->
+            <h2 id="tiktok">🎵 TikTok Configuration</h2>
+
+            <div class="method-card">
+                <h3>Session ID Method <span class="method-badge unofficial">UNOFFICIAL</span></h3>
+                
+                <div class="warning">
+                    <strong>⚠️ Warning:</strong> This is an unofficial method that extracts your session cookie. It may stop working if TikTok changes their system, and could potentially violate their Terms of Service.
+                </div>
+
+                <p><strong>How to Get Your TikTok Session ID:</strong></p>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>Log in to TikTok on Desktop Browser</strong>
+                    <ul>
+                        <li>Open Chrome, Edge, or Firefox</li>
+                        <li>Go to <a href="https://www.tiktok.com" target="_blank">www.tiktok.com</a></li>
+                        <li>Log in to your account</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>Open Developer Tools</strong>
+                    <ul>
+                        <li>Right-click anywhere on the page</li>
+                        <li>Click "Inspect" or press <code>F12</code></li>
+                        <li>Developer tools will open at the bottom or side</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>Navigate to Application/Storage Tab</strong>
+                    <ul>
+                        <li>In developer tools, click the <strong>"Application"</strong> tab (Chrome/Edge)</li>
+                        <li>Or <strong>"Storage"</strong> tab (Firefox)</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>Find Session Cookie</strong>
+                    <ul>
+                        <li>In the left sidebar, expand <strong>"Cookies"</strong></li>
+                        <li>Click on <code>https://www.tiktok.com</code></li>
+                        <li>Scroll through the list and find <code>sessionid</code></li>
+                        <li>Click on it to view the value</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <strong>Copy the Session ID</strong>
+                    <ul>
+                        <li>Double-click the <strong>Value</strong> field</li>
+                        <li>Copy the entire string (usually long and alphanumeric)</li>
+                        <li>It will look something like: <code>3a4b5c6d7e8f9g0h1i2j3k4l5m6n7o8p</code></li>
+                    </ul>
+                </div>
+
+                <div class="success">
+                    ✅ Paste the Session ID in the <strong>TikTok Session ID</strong> field on the Settings page.
+                </div>
+
+                <div class="note">
+                    <strong>Session Expiry:</strong> Session IDs can expire after a period of inactivity or if you log out. If publishing stops working, you may need to obtain a fresh session ID.
+                </div>
+            </div>
+
+            <div class="method-card">
+                <h3>TikTok Official API <span class="method-badge official">OFFICIAL</span> <span style="background: #e2e3e5; color: #383d41;" class="method-badge">COMPLEX</span></h3>
+                
+                <p>TikTok offers an official Content Posting API, but it requires:</p>
+                <ul>
+                    <li>Approval from TikTok (application process)</li>
+                    <li>Business/Developer account</li>
+                    <li>OAuth authentication flow</li>
+                    <li>Webhook setup for notifications</li>
+                </ul>
+
+                <p>Learn more: <a href="https://developers.tiktok.com/" target="_blank">TikTok for Developers</a></p>
+
+                <div class="note">
+                    This application currently doesn't support the official TikTok API due to its complexity. Consider using the Session ID method for now.
+                </div>
+            </div>
+
+            <!-- Testing Section -->
+            <h2 id="testing">🧪 Testing Your Configuration</h2>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Save Your Credentials</strong>
+                <p>Go to the <a href="/settings">Settings page</a> and enter all your credentials, then click "Save Configuration".</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Test Facebook Token</strong>
+                <p>On the Settings page, click the <strong>"Test token"</strong> button next to the Facebook Access Token field. You should see "OK" if the token is valid.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Run a Test Scrape</strong>
+                <p>Go to the <a href="/">Dashboard</a> and try scraping some images to test the system.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>Create Test Content</strong>
+                <p>Use the <a href="/editor">Editor</a> to create a test video reel from your scraped images.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">5</span>
+                <strong>Test Publishing</strong>
+                <p>Attempt to publish the test video.</p>
+                <div class="note" style="margin-top: 5px;">
+                    <strong>Note:</strong> The current system runs in <strong>Simulation Mode</strong>. It will validate that your configuration is loaded, but will <u>not</u> actually upload content to social media platforms yet. Check the server logs (or the logs page) to see the success message.
+                </div>
+            </div>
+
+            <!-- Troubleshooting -->
+            <h2>🔧 Troubleshooting</h2>
+
+            <div class="method-card">
+                <h3>Common Issues</h3>
+                
+                <p><strong>Token Invalid or Expired</strong></p>
+                <ul>
+                    <li>Facebook/Instagram tokens expire. Generate a new long-lived token.</li>
+                    <li>Use the Access Token Debugger to check expiration dates.</li>
+                </ul>
+
+                <p><strong>Insufficient Permissions</strong></p>
+                <ul>
+                    <li>When generating tokens, ensure you select all required permissions.</li>
+                    <li>You may need to re-authorize the app with additional permissions.</li>
+                </ul>
+
+                <p><strong>Instagram Not Connecting to Facebook Page</strong></p>
+                <ul>
+                    <li>Make sure your Instagram account is converted to Business/Creator.</li>
+                    <li>Verify the page connection in Instagram settings.</li>
+                    <li>You must be an admin of the Facebook Page.</li>
+                </ul>
+
+                <p><strong>TikTok Session ID Not Working</strong></p>
+                <ul>
+                    <li>Make sure you copied the entire session ID value.</li>
+                    <li>Try logging out and back in to TikTok, then get a fresh session ID.</li>
+                    <li>Check that you're copying from <code>www.tiktok.com</code>, not a country-specific domain.</li>
+                </ul>
+
+                <p><strong>Publishing Errors</strong></p>
+                <ul>
+                    <li>Verify your token/credentials are still valid and saved in Settings.</li>
+                    <li>Check the <a href="/logs">Server Logs</a> for specific error details.</li>
+                </ul>
+            </div>
+
+            <!-- Need Help -->
+            <div class="success" style="margin-top: 30px;">
+                <h3 style="margin-top: 0;">✅ Configuration Complete!</h3>
+                <p>Once you've set up your credentials, head back to the <a href="/settings">Settings page</a> to save them, then start using the Dashboard to automate your social media posting!</p>
+                <a href="/settings" class="btn-primary">Go to Settings</a>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor - Marketing Agent</title>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; background: #eaeff5; display: flex; height: 100vh; color: #334e68; }
+        .sidebar { width: 250px; background: #fff; border-right: 1px solid #dae1e7; padding: 20px; display: flex; flex-direction: column; box-shadow: 2px 0 5px rgba(0,0,0,0.02); z-index: 10; }
+        .sidebar h2 { color: #102a43; margin-top: 0; font-weight: 700; letter-spacing: -0.5px; }
+        .nav-link { 
+            display: block; padding: 12px 15px; margin-bottom: 5px; 
+            text-decoration: none; color: #486581; border-radius: 6px; 
+            transition: all 0.2s ease; font-weight: 500;
+        }
+        .nav-link:hover { background: #f0f4f8; color: #102a43; transform: translateX(3px); }
+        .nav-link.active { background: linear-gradient(135deg, #007bff, #0056b3); color: white; box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2); }
+        
+        .main { flex: 1; padding: 40px; overflow-y: auto; display: flex; gap: 30px; background-image: radial-gradient(#dceefb 1px, transparent 1px); background-size: 20px 20px; }
+        .col { flex: 1; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; flex-direction: column; border-top: 5px solid #007bff; }
+        
+        h2 { 
+            margin-top: 0; color: #334e68; border-bottom: 2px solid #f0f4f8; padding-bottom: 15px; margin-bottom: 20px;
+            font-size: 1.5rem; letter-spacing: -0.5px;
+        }
+        h3 { color: #334e68; margin-top: 20px; font-weight: 600; display: flex; align-items: center; }
+        h3::before { content: ''; display: inline-block; width: 8px; height: 8px; background: #f6ad55; border-radius: 50%; margin-right: 10px; }
+
+        .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; overflow-y: auto; max-height: 600px; padding: 5px; }
+        .image-item { position: relative; cursor: pointer; border: 3px solid transparent; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: all 0.2s; }
+        .image-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
+        .image-item.selected { border-color: #007bff; transform: scale(0.98); }
+        .image-item img { width: 100%; height: 110px; object-fit: cover; display: block; }
+        .image-item input { position: absolute; top: 8px; right: 8px; width: 18px; height: 18px; accent-color: #007bff; }
+
+        .delete-btn {
+            position: absolute; top: 5px; left: 5px; background: rgba(220, 53, 69, 0.9);
+            color: white; border: none; border-radius: 50%; width: 24px; height: 24px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: bold; z-index: 10; transition: all 0.2s;
+        }
+        .delete-btn:hover { background: #dc3545; transform: scale(1.1); }
+        #loadMoreBtn { margin-top: 15px; background: #e0e0e0; color: #333; }
+        #loadMoreBtn:hover { background: #d0d0d0; }
+
+        .preview-area { 
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: #f0f4f8; border: 2px dashed #bcccdc; border-radius: 12px; 
+            min-height: 300px; margin-bottom: 20px; position: relative; transition: all 0.3s;
+        }
+        video { max-width: 100%; max-height: 480px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        
+        button {
+            background-color: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer;
+            font-size: 16px; width: 100%; margin-top: 15px; font-weight: 600; box-shadow: 0 4px 6px rgba(0,123,255,0.2);
+            transition: all 0.2s;
+        }
+        button:hover { background-color: #0056b3; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,123,255,0.3); }
+        button:disabled { background-color: #cbd5e0; cursor: not-allowed; transform: none; box-shadow: none; color: #829ab1; }
+        
+        .publish-options { margin-top: 25px; padding: 20px; background: #f8fafc; border-radius: 8px; border: 1px solid #e1e8ef; }
+        .checkbox-group { margin-bottom: 15px; display: flex; gap: 15px; flex-wrap: wrap; }
+        .checkbox-group label { display: flex; align-items: center; cursor: pointer; font-weight: 500; color: #334e68; }
+        .checkbox-group input { margin-right: 8px; width: 18px; height: 18px; accent-color: #007bff; }
+        
+        textarea { 
+            width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #dae1e7; border-radius: 6px; 
+            resize: vertical; box-sizing: border-box; font-family: inherit; font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        textarea:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Marketing AI</h2>
+        <a href="/" class="nav-link">Dashboard</a>
+        <a href="/editor" class="nav-link active">Editor</a>
+        <a href="/gallery" class="nav-link">Gallery</a>
+        <a href="/settings" class="nav-link">Settings</a>
+        <a href="/logs" class="nav-link">Server Logs</a>
+        <a href="/about" class="nav-link">About / Docs</a>
+        <a href="/help" class="nav-link">Setup Guide</a>
+    </div>
+    
+    <div class="main">
+        <!-- Left Column: Image Selection -->
+        <div class="col" style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>1. Select Images</h2>
+                <div>
+                   <input type="file" id="imageUpload" accept="image/*" multiple style="display: none;" onchange="uploadFiles(this.files, 'image')">
+                   <button onclick="document.getElementById('imageUpload').click()" style="width: auto; margin-top: 0; padding: 5px 10px; font-size: 14px;">+ Upload Images</button>
+                </div>
+            </div>
+            <p>Choose images to include in your reel.</p>
+            <div class="image-grid" id="imageGrid">
+                <!-- Populated by JS -->
+            </div>
+            <div class="pagination-controls" style="display: flex; gap: 10px; margin-top: 15px;">
+                <button id="prevBtn" onclick="changePage(-1)" disabled>Previous</button>
+                <button id="nextBtn" onclick="changePage(1)">Next</button>
+            </div>
+            <br>
+            <div style="margin-top: 15px; margin-bottom: 15px; background: #eee; padding: 10px; border-radius: 4px;">
+                <label style="font-weight: bold;">Output Type:</label>
+                <div style="display: flex; gap: 15px; margin-top: 5px;">
+                    <label style="font-weight: normal; cursor: pointer;">
+                        <input type="radio" name="output_type" value="video" checked onchange="toggleMusicSelect()"> Video Reel
+                    </label>
+                    <label style="font-weight: normal; cursor: pointer;">
+                        <input type="radio" name="output_type" value="post" onchange="toggleMusicSelect()"> Carousel Post
+                    </label>
+                </div>
+            </div>
+
+            <div id="music-selector" style="margin-bottom: 15px; background: #eee; padding: 10px; border-radius: 4px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                     <label style="font-weight: bold;">Background Music:</label>
+                     <div>
+                        <input type="file" id="musicUpload" accept="audio/*" style="display: none;" onchange="uploadFiles(this.files, 'music')">
+                        <button onclick="document.getElementById('musicUpload').click()" style="width: auto; margin-top: 0; padding: 5px 10px; font-size: 12px; background: #6c757d;">+ Upload Music</button>
+                     </div>
+                </div>
+                <select id="musicSelect" style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ddd;">
+                    <option value="">Random</option>
+                    <!-- Populated by JS -->
+                </select>
+                <div style="margin-top: 5px;">
+                     <audio id="audioPreview" controls style="width: 100%; display: none; margin-top: 5px; height: 30px;"></audio>
+                </div>
+            </div>
+            <button onclick="createContent()" id="createBtn">Create Content</button>
+        </div>
+
+        <!-- Right Column: Preview & Publish -->
+        <div class="col" style="flex: 1;">
+            <h2>2. Preview & Publish</h2>
+            
+            <div class="preview-area" id="previewArea">
+                <p style="color: #999;">Preview will appear here</p>
+                <div id="previewContent" style="width: 100%; display: flex; justify-content: center;"></div>
+            </div>
+
+            <div class="publish-options">
+                <h3>Publishing Options</h3>
+                <textarea id="caption" rows="3" placeholder="Enter caption here...">Check out this custom reel! #AleppoGift</textarea>
+                
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="pub_insta" checked> Instagram</label>
+                    <label><input type="checkbox" id="pub_fb" checked> Facebook</label>
+                    <label><input type="checkbox" id="pub_tiktok"> TikTok</label>
+                </div>
+                
+                <button id="publishBtn" onclick="publishContent()" disabled>Publish Now</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Existing initialization
+        let allImages = {{ images | tojson | safe }};
+        let currentIndex = 0;
+        const batchSize = 20; 
+        let currentVideoFilename = null;
+        let selectedImages = new Set();
+        
+        // --- New Features Logic ---
+
+        function toggleMusicSelect() {
+            const outputType = document.querySelector('input[name="output_type"]:checked').value;
+            const musicSelector = document.getElementById('music-selector');
+            if (outputType === 'post') {
+                musicSelector.style.display = 'none';
+            } else {
+                musicSelector.style.display = 'block';
+            }
+        }
+
+        async function loadMusicList() {
+             try {
+                const response = await fetch('/api/music/list');
+                const data = await response.json();
+                if (data.success) {
+                    const select = document.getElementById('musicSelect');
+                    // Keep the first "Random" option
+                    select.innerHTML = '<option value="">Random</option>';
+                    data.files.forEach(file => {
+                        const option = document.createElement('option');
+                        option.value = file;
+                        option.text = file;
+                        select.appendChild(option);
+                    });
+                    
+                    // Add preview listener
+                    select.onchange = function() {
+                        const audio = document.getElementById('audioPreview');
+                        if (this.value) {
+                            audio.src = '/assets/music/' + this.value;
+                            audio.style.display = 'block';
+                            audio.play().catch(e => console.log("Auto-play prevented", e));
+                        } else {
+                            audio.pause();
+                            audio.style.display = 'none';
+                        }
+                    };
+                }
+            } catch (e) {
+                console.error("Failed to load music list", e);
+            }
+        }
+
+        async function uploadFiles(files, type) {
+            if (!files || files.length === 0) return;
+            
+            // Show loading state if needed
+            const btn = type === 'image' ? document.getElementById('imageUpload').nextElementSibling : document.getElementById('musicUpload').nextElementSibling;
+            const originalText = btn.innerText;
+            btn.innerText = "Uploading...";
+            btn.disabled = true;
+
+            try {
+                // Upload each file
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('type', type);
+
+                    const response = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        if (type === 'image') {
+                            // Add to available images and select it
+                            if (!allImages.includes(data.filename)) {
+                                allImages.unshift(data.filename); // Add to top
+                            }
+                            selectedImages.add(data.filename);
+                        } else if (type === 'music') {
+                            // Refresh music list
+                            await loadMusicList();
+                             // Select the uploaded music
+                            const select = document.getElementById('musicSelect');
+                            select.value = data.filename;
+                            select.onchange(); // Trigger preview
+                        }
+                    } else {
+                        console.error('Upload failed for ' + file.name + ': ' + data.message);
+                        alert('Upload failed: ' + data.message);
+                    }
+                }
+                
+                if (type === 'image') {
+                    // Refresh grid to show new image
+                    renderPage();
+                }
+
+            } catch (e) {
+                alert("Error uploading: " + e);
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+                // clear inputs
+                if(type === 'image') document.getElementById('imageUpload').value = "";
+                else document.getElementById('musicUpload').value = "";
+            }
+        }
+
+        // Initialize Call
+        loadMusicList();
+
+        // --- End New Features Logic ---
+
+        function renderPage() {
+            const grid = document.getElementById('imageGrid');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            // 1. Identify currently shown non-selected items to remove
+            const items = Array.from(grid.children);
+            items.forEach(item => {
+                const checkbox = item.querySelector('input');
+                if (!checkbox.checked) {
+                    item.remove();
+                } else {
+                    selectedImages.add(checkbox.value);
+                }
+            });
+
+            // 2. Get current batch slice
+            const end = Math.min(currentIndex + batchSize, allImages.length);
+            const currentBatch = allImages.slice(currentIndex, end);
+            
+            currentBatch.forEach(img => {
+                // Determine if this image is already in the DOM (because it was selected)
+                const existing = grid.querySelector(`input[value="${img}"]`);
+                if (existing) return;
+                
+                const div = document.createElement('div');
+                div.className = 'image-item';
+                div.onclick = function() { toggleSelection(this) };
+                
+                const isChecked = selectedImages.has(img) ? 'checked' : '';
+                const isSelectedClass = selectedImages.has(img) ? 'selected' : '';
+                
+                if (isSelectedClass) div.classList.add('selected');
+
+                div.innerHTML = `
+                    <button class="delete-btn" onclick="event.stopPropagation(); deleteImage('${img}', this)">×</button>
+                    <img src="/assets/images/${img}" loading="lazy">
+                    <input type="checkbox" value="${img}" ${isChecked} onclick="event.stopPropagation(); toggleSelection(this.parentElement)">
+                `;
+                grid.appendChild(div);
+            });
+            
+            // Update buttons
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = (currentIndex + batchSize) >= allImages.length;
+        }
+
+        function changePage(direction) {
+            const newIndex = currentIndex + (direction * batchSize);
+            // Allow going to next page if it exists
+            if (direction > 0 && newIndex < allImages.length) {
+                currentIndex = newIndex;
+                renderPage();
+            }
+            // Allow going back if not at 0
+            if (direction < 0 && newIndex >= 0) {
+                currentIndex = newIndex;
+                renderPage();
+            }
+        }
+
+        let currentMediaFiles = []; // Stores the filename(s) of created content
+
+        async function deleteImage(filename, btnElement) {
+            if(!confirm('Delete this image?')) return;
+            
+            try {
+                const response = await fetch(`/api/image/delete?filename=${filename}`, { method: 'DELETE' });
+                const data = await response.json();
+                if(data.success) {
+                    btnElement.closest('.image-item').remove();
+                    selectedImages.delete(filename); // Remove from set if deleted
+                } else {
+                    alert(data.message);
+                }
+            } catch(e) {
+                alert(e);
+            }
+        }
+
+        // Initialize grid
+        renderPage();
+
+        function toggleSelection(el) {
+            const checkbox = el.querySelector('input');
+            const isClickOnDiv = event.target !== checkbox;
+            
+            if (isClickOnDiv) {
+                checkbox.checked = !checkbox.checked;
+            }
+            
+            if (checkbox.checked) {
+                el.classList.add('selected');
+                selectedImages.add(checkbox.value);
+            } else {
+                el.classList.remove('selected');
+                selectedImages.delete(checkbox.value);
+            }
+        }
+
+        async function createContent() {
+            const checkboxes = document.querySelectorAll('.image-item input:checked');
+            const images = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (images.length === 0) {
+                alert("Please select at least one image.");
+                return;
+            }
+
+            // Get Output Type
+            const outputType = document.querySelector('input[name="output_type"]:checked').value;
+            const musicFile = document.getElementById('musicSelect').value;
+
+            const btn = document.getElementById('createBtn');
+            const previewArea = document.getElementById('previewArea');
+            const previewContent = document.getElementById('previewContent');
+            
+            btn.disabled = true;
+            btn.innerText = "Creating...";
+            if (outputType === 'post') {
+                previewContent.innerHTML = '<p>Generating post images... please wait...</p>';
+            } else {
+                previewContent.innerHTML = '<p>Generating video... please wait...</p>';
+            }
+
+            try {
+                const response = await fetch('/api/editor/create', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        images: images, 
+                        type: outputType,
+                        music_file: musicFile 
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    previewContent.innerHTML = '';
+                    
+                    if (data.output_type === 'post') {
+                         currentMediaFiles = data.files.map(url => url.split('/').pop()); // Extract filenames
+                         // Display Carousel
+                         let html = '<div style="display: flex; gap: 10px; overflow-x: auto; padding: 10px;">';
+                         data.files.forEach(url => {
+                             html += `<img src="${url}" style="height: 200px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">`;
+                         });
+                         html += '</div>';
+                         previewContent.innerHTML = html;
+
+                    } else {
+                        currentMediaFiles = [data.video_filename];
+                        previewContent.innerHTML = `
+                            <video controls autoplay style="max-width: 100%; max-height: 400px;">
+                                <source src="${data.video_url}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        `;
+                    }
+                    
+                    document.getElementById('publishBtn').disabled = false;
+                } else {
+                    previewContent.innerHTML = `<p style="color:red">Error: ${data.message}</p>`;
+                }
+            } catch (e) {
+                previewContent.innerHTML = `<p style="color:red">Server Error: ${e}</p>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Create Content";
+            }
+        }
+
+        async function publishContent() {
+            if (!currentMediaFiles || currentMediaFiles.length === 0) return;
+            
+            const btn = document.getElementById('publishBtn');
+            const caption = document.getElementById('caption').value;
+            const platforms = [];
+            
+            if (document.getElementById('pub_insta').checked) platforms.push('instagram');
+            if (document.getElementById('pub_fb').checked) platforms.push('facebook');
+            if (document.getElementById('pub_tiktok').checked) platforms.push('tiktok');
+            
+            if (platforms.length === 0) {
+                alert("Please select at least one platform.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Publishing...";
+
+            try {
+                const response = await fetch('/api/editor/publish', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        media_files: currentMediaFiles,
+                        caption: caption,
+                        platforms: platforms
+                    })
+                });
+                const data = await response.json();
+                
+                alert(data.message);
+            } catch (e) {
+                 alert("Error publishing: " + e);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Publish Now";
+            }
+        }
+    </script>
+</body>
+</html>

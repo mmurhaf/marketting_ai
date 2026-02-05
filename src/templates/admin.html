@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Agent Admin</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max_width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+        }
+        .section-title {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: #666;
+            font-size: 1.2em;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            padding: 15px;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Marketing Agent Configuration</h1>
+        
+        {% if success %}
+        <div class="alert">
+            Settings saved successfully!
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            <div class="section-title">Instagram Configuration</div>
+            <div class="form-group">
+                <label for="instagram_username">Username</label>
+                <input type="text" id="instagram_username" name="instagram_username" value="{{ config.get('instagram_username', '') }}" placeholder="Enter Instagram Username">
+            </div>
+            <div class="form-group">
+                <label for="instagram_password">Password</label>
+                <input type="password" id="instagram_password" name="instagram_password" value="{{ config.get('instagram_password', '') }}" placeholder="Enter Instagram Password">
+            </div>
+
+            <div class="section-title">Facebook Configuration</div>
+            <div class="form-group">
+                <label for="facebook_access_token">Access Token</label>
+                <input type="password" id="facebook_access_token" name="facebook_access_token" value="{{ config.get('facebook_access_token', '') }}" placeholder="Enter Facebook Graph API Token">
+            </div>
+
+            <div class="section-title">TikTok Configuration</div>
+            <div class="form-group">
+                <label for="tiktok_session_id">Session ID</label>
+                <input type="password" id="tiktok_session_id" name="tiktok_session_id" value="{{ config.get('tiktok_session_id', '') }}" placeholder="Enter TikTok Session ID">
+            </div>
+
+            <button type="submit">Save Configuration</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Marketing Agent</title>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; background: #eaeff5; display: flex; height: 100vh; color: #334e68; }
+        .sidebar { width: 250px; background: #fff; border-right: 1px solid #dae1e7; padding: 20px; display: flex; flex-direction: column; box-shadow: 2px 0 5px rgba(0,0,0,0.02); z-index: 10; }
+        .sidebar h2 { color: #102a43; margin-top: 0; font-weight: 700; letter-spacing: -0.5px; }
+        .nav-link { 
+            display: block; padding: 12px 15px; margin-bottom: 5px; 
+            text-decoration: none; color: #486581; border-radius: 6px; 
+            transition: all 0.2s ease; font-weight: 500;
+        }
+        .nav-link:hover { background: #f0f4f8; color: #102a43; transform: translateX(3px); }
+        .nav-link.active { background: linear-gradient(135deg, #007bff, #0056b3); color: white; box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2); }
+        
+        .main { flex: 1; padding: 40px; overflow-y: auto; background-image: radial-gradient(#dceefb 1px, transparent 1px); background-size: 20px 20px; }
+        
+        h1 { 
+            margin-top: 0; font-size: 2.2rem; margin-bottom: 30px; letter-spacing: -0.5px;
+            background: linear-gradient(120deg, #007bff, #6610f2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        
+        .section { margin-bottom: 50px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        h3 { color: #102a43; border-bottom: 2px solid #f0f4f8; padding-bottom: 10px; margin-bottom: 25px; margin-top: 0; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .grid-item { 
+            background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            display: flex; flex-direction: column; border: 1px solid #e1e8ef; transition: all 0.2s;
+        }
+        .grid-item:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        
+        .grid-item img, .grid-item video { width: 100%; height: auto; border-radius: 6px; display: block; margin-bottom: 10px; }
+        .filename { font-size: 13px; color: #627d98; margin-bottom: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: monospace; }
+        .actions { display: flex; gap: 8px; margin-top: auto; }
+        
+        .btn-sm { 
+            font-size: 13px; padding: 8px 10px; border: none; border-radius: 4px; cursor: pointer; color: white; flex: 1; 
+            font-weight: 600; transition: all 0.2s;
+        }
+        .btn-del { background: #e53e3e; }
+        .btn-del:hover { background: #c53030; }
+        .btn-pub { background: #38a169; }
+        .btn-pub:hover { background: #2f855a; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Marketing AI</h2>
+        <a href="/" class="nav-link">Dashboard</a>
+        <a href="/editor" class="nav-link">Editor</a>
+        <a href="/gallery" class="nav-link active">Gallery</a>
+        <a href="/settings" class="nav-link">Settings</a>
+        <a href="/logs" class="nav-link">Server Logs</a>
+        <a href="/about" class="nav-link">About / Docs</a>
+        <a href="/help" class="nav-link">Setup Guide</a>
+    </div>
+    
+    <div class="main">
+        <h1>Asset Gallery</h1>
+        
+        <div class="section">
+            <h3>Generated Reels</h3>
+            {% if videos %}
+            <div class="grid">
+                {% for video in videos %}
+                <div class="grid-item">
+                    <video controls>
+                        <source src="/assets/output/{{ video }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="filename">{{ video }}</div>
+                    <div class="actions">
+                        <button class="btn-sm btn-pub" onclick="publishVideo('{{ video }}')">Publish</button>
+                        <button class="btn-sm btn-del" onclick="deleteAsset('{{ video }}', 'video')">Delete</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No videos generated yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h3>Downloaded Images</h3>
+            {% if images %}
+            <div class="grid">
+                {% for image in images %}
+                <div class="grid-item">
+                    <img src="/assets/images/{{ image }}" loading="lazy" alt="{{ image }}">
+                    <div class="filename">{{ image }}</div>
+                     <div class="actions">
+                        <button class="btn-sm btn-del" onclick="deleteAsset('{{ image }}', 'image')">Delete</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No images downloaded yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        async function deleteAsset(filename, type) {
+            if (!confirm("Are you sure you want to delete this file?")) return;
+            
+            try {
+                // Determine API endpoint behavior. We updated /api/image/delete to take 'type'
+                const response = await fetch(`/api/image/delete?filename=${encodeURIComponent(filename)}&type=${type}`, { method: 'DELETE' });
+                const data = await response.json();
+                if (data.success) {
+                    location.reload(); 
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch(e) {
+                alert("Error: " + e);
+            }
+        }
+
+        async function publishVideo(filename) {
+            if (!confirm("Publish this video to all configured platforms?")) return;
+            
+            try {
+                const response = await fetch('/api/editor/publish', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        video_filename: filename, 
+                        platforms: ['instagram', 'facebook'] // Defaulting to common ones
+                    })
+                });
+                const data = await response.json();
+                alert(data.message);
+            } catch(e) {
+                alert("Error: " + e);
+            }
+        }
+    </script>
+</body>
+</html>

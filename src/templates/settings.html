@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Marketing Agent</title>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; background: #eaeff5; display: flex; height: 100vh; color: #334e68; }
+        
+        .sidebar { width: 250px; background: #fff; border-right: 1px solid #dae1e7; padding: 20px; display: flex; flex-direction: column; box-shadow: 2px 0 5px rgba(0,0,0,0.02); z-index: 10; }
+        .sidebar h2 { color: #102a43; margin-top: 0; font-weight: 700; letter-spacing: -0.5px; }
+        .nav-link { 
+            display: block; padding: 12px 15px; margin-bottom: 5px; 
+            text-decoration: none; color: #486581; border-radius: 6px; 
+            transition: all 0.2s ease; font-weight: 500;
+        }
+        .nav-link:hover { background: #f0f4f8; color: #102a43; transform: translateX(3px); }
+        .nav-link.active { background: linear-gradient(135deg, #007bff, #0056b3); color: white; box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2); }
+
+        .container {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto; 
+            background-image: radial-gradient(#dceefb 1px, transparent 1px); background-size: 20px 20px;
+        }
+        .card { 
+            background: white; padding: 40px; border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 800px; margin: 0 auto;
+            border-top: 5px solid #007bff;
+        }
+        
+        h1 { 
+            margin-top: 0; font-size: 2.2rem; margin-bottom: 30px; letter-spacing: -0.5px;
+            background: linear-gradient(120deg, #007bff, #6610f2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        
+        .form-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #334e68; font-size: 0.95rem; }
+        input[type="text"], input[type="password"] {
+            width: 100%; padding: 12px; border: 1px solid #dae1e7; border-radius: 6px; box-sizing: border-box;
+            font-family: inherit; font-size: 15px; transition: all 0.2s; background: #f8fafc;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            background: #fff; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); outline: none;
+        }
+        
+        .section-title { 
+            margin-top: 40px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f0f4f8; 
+            color: #102a43; font-size: 1.3em; font-weight: 600;
+        }
+        
+        button {
+            background-color: #007bff; color: white; padding: 14px 24px; border: none; border-radius: 6px; cursor: pointer;
+            width: 100%; font-size: 16px; margin-top: 30px; font-weight: 600; box-shadow: 0 4px 6px rgba(0,123,255,0.2);
+            transition: all 0.2s;
+        }
+        button:hover { background-color: #0056b3; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,123,255,0.3); }
+        
+        .alert { padding: 15px; background-color: #d4edda; color: #155724; border-radius: 6px; margin-bottom: 25px; border-left: 5px solid #28a745; }
+        
+        .help-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .help-banner h3 { margin: 0 0 5px 0; font-size: 1.2rem; }
+        .help-banner p { margin: 0; opacity: 0.9; }
+        .help-btn {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            white-space: nowrap;
+            border: 1px solid rgba(255,255,255,0.4);
+            transition: all 0.2s;
+        }
+        .help-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+        .field-help { font-size: 13px; color: #829ab1; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Marketing AI</h2>
+        <a href="/" class="nav-link">Dashboard</a>
+        <a href="/editor" class="nav-link">Editor</a>
+        <a href="/gallery" class="nav-link">Gallery</a>
+        <a href="/settings" class="nav-link active">Settings</a>
+        <a href="/logs" class="nav-link">Server Logs</a>
+        <a href="/about" class="nav-link">About / Docs</a>
+        <a href="/help" class="nav-link">Setup Guide</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h1>Configuration</h1>
+            
+            <div class="help-banner">
+                <div>
+                    <h3>🚀 Need Help Getting Started?</h3>
+                    <p>Follow our step-by-step guide to connect your social media accounts</p>
+                </div>
+                <a href="/help" class="help-btn">Setup Guide →</a>
+            </div>
+            
+            {% if success %}
+            <div class="alert">
+                Settings saved successfully!
+            </div>
+            {% endif %}
+
+            <form method="POST">
+                <div class="section-title">Source Configuration</div>
+                <div class="form-group">
+                    <label for="image_source_url">Image Source URL</label>
+                    <input type="text" id="image_source_url" name="image_source_url" value="{{ config.get('image_source_url', 'https://aleppogift.com/') }}" placeholder="Enter Image Source URL">
+                    <div class="field-help">Website to scrape product images from for social media content</div>
+                </div>
+
+                <div class="section-title">Instagram Configuration</div>
+                <div class="form-group">
+                    <label for="instagram_username">Username (Unofficial Method)</label>
+                    <input type="text" id="instagram_username" name="instagram_username" value="{{ config.get('instagram_username', '') }}" placeholder="Enter Instagram Username">
+                    <div class="field-help">For unofficial instagrapi method only. Not recommended.</div>
+                </div>
+                <div class="form-group">
+                    <label for="instagram_password">Password (Unofficial Method)</label>
+                    <input type="password" id="instagram_password" name="instagram_password" value="" placeholder="{% if instagram_password_set %}Saved (hidden) — type to replace{% else %}Enter Instagram Password{% endif %}">
+                    <div style="margin-top: 8px;">
+                        <label style="font-weight: normal;">
+                            <input type="checkbox" name="clear_instagram_password"> Clear saved password
+                        </label>
+                    </div>
+                    <div class="field-help">⚠️ Warning: Unofficial method may violate Instagram TOS</div>
+                </div>
+                <div class="form-group">
+                    <label for="instagram_business_account_id">Business Account ID (Official API)</label>
+                    <input type="text" id="instagram_business_account_id" name="instagram_business_account_id" value="{{ config.get('instagram_business_account_id', '') }}" placeholder="Enter Instagram Business Account ID">
+                    <div class="field-help">Required for Instagram Graph API. <a href="/help#instagram" target="_blank">How to get this?</a></div>
+                </div>
+
+                <div class="section-title">Facebook Configuration</div>
+                <div class="form-group">
+                    <label for="facebook_page_id">Facebook Page ID</label>
+                    <input type="text" id="facebook_page_id" name="facebook_page_id" value="{{ config.get('facebook_page_id', '') }}" placeholder="Enter Facebook Page ID">
+                    <div class="field-help">Your Facebook Page ID (numeric). <a href="/help#facebook" target="_blank">How to find this?</a></div>
+                </div>
+                <div class="form-group">
+                    <label for="facebook_access_token">Page Access Token</label>
+                    <input type="password" id="facebook_access_token" name="facebook_access_token" value="" placeholder="{% if facebook_access_token_set %}Saved (hidden) — paste to replace{% else %}Enter Facebook Page Access Token{% endif %}">
+                    <div style="margin-top: 8px;">
+                        <label style="font-weight: normal;">
+                            <input type="checkbox" name="clear_facebook_access_token"> Clear saved token
+                        </label>
+                    </div>
+                    <div class="field-help">Long-lived Page Access Token from Meta for Developers. <a href="/help#facebook" target="_blank">Get instructions</a></div>
+                    <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
+                        <button type="button" id="testFacebook" style="width: auto; padding: 10px 16px;">Test token</button>
+                        <span id="fbTestResult" style="color: #555;"></span>
+                    </div>
+                </div>
+
+                <div class="section-title">TikTok Configuration</div>
+                <div class="form-group">
+                    <label for="tiktok_session_id">Session ID (Unofficial Method)</label>
+                    <input type="password" id="tiktok_session_id" name="tiktok_session_id" value="" placeholder="{% if tiktok_session_id_set %}Saved (hidden) — paste to replace{% else %}Enter TikTok Session ID{% endif %}">
+                    <div style="margin-top: 8px;">
+                        <label style="font-weight: normal;">
+                            <input type="checkbox" name="clear_tiktok_session_id"> Clear saved session
+                        </label>
+                    </div>
+                    <div class="field-help">Extract from browser cookies. <a href="/help#tiktok" target="_blank">Step-by-step guide</a></div>
+                </div>
+
+                <button type="submit">Save Configuration</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const testBtn = document.getElementById('testFacebook');
+        const fbTestResult = document.getElementById('fbTestResult');
+
+        if (testBtn) {
+            testBtn.addEventListener('click', async () => {
+                fbTestResult.textContent = 'Testing…';
+                try {
+                    const resp = await fetch('/api/test/facebook', { method: 'POST' });
+                    const data = await resp.json();
+                    if (data.success) {
+                        const name = data.data && data.data.name ? ` (${data.data.name})` : '';
+                        fbTestResult.textContent = `OK${name}`;
+                        fbTestResult.style.color = '#155724';
+                    } else {
+                        fbTestResult.textContent = `Failed: ${data.message || 'Unknown error'}`;
+                        fbTestResult.style.color = '#721c24';
+                    }
+                } catch (e) {
+                    fbTestResult.textContent = `Failed: ${e}`;
+                    fbTestResult.style.color = '#721c24';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
