@@ -97,6 +97,7 @@
         <a href="/logs" class="nav-link">Server Logs</a>
         <a href="/about" class="nav-link">About / Docs</a>
         <a href="/help" class="nav-link">Setup Guide</a>
+        <a href="/manual" class="nav-link">User Manual</a>
     </div>
 
     <div class="container">
@@ -124,6 +125,18 @@
                     <input type="text" id="image_source_url" name="image_source_url" value="{{ config.get('image_source_url', 'https://aleppogift.com/') }}" placeholder="Enter Image Source URL">
                     <div class="field-help">Website to scrape product images from for social media content</div>
                 </div>
+                <div class="form-group">
+                    <label for="scrape_limit">Images to Scrape Per Run</label>
+                    <input type="text" id="scrape_limit" name="scrape_limit" value="{{ config.get('scrape_limit', '5') }}" placeholder="5">
+                    <div class="field-help">How many new images to download each time the scraper runs (default: 5)</div>
+                </div>
+
+                <div class="section-title">Content Defaults</div>
+                <div class="form-group">
+                    <label for="default_caption">Default Post Caption</label>
+                    <input type="text" id="default_caption" name="default_caption" value="{{ config.get('default_caption', 'Check out our new collection! #aleppogift') }}" placeholder="Enter default caption for published posts">
+                    <div class="field-help">Used by the Dashboard quick-publish and as the pre-filled caption in the Editor</div>
+                </div>
 
                 <div class="section-title">Instagram Configuration</div>
                 <div class="form-group">
@@ -145,6 +158,10 @@
                     <label for="instagram_business_account_id">Business Account ID (Official API)</label>
                     <input type="text" id="instagram_business_account_id" name="instagram_business_account_id" value="{{ config.get('instagram_business_account_id', '') }}" placeholder="Enter Instagram Business Account ID">
                     <div class="field-help">Required for Instagram Graph API. <a href="/help#instagram" target="_blank">How to get this?</a></div>
+                    <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
+                        <button type="button" id="testInstagram" style="width: auto; padding: 10px 16px;">Test credentials</button>
+                        <span id="igTestResult" style="color: #555;"></span>
+                    </div>
                 </div>
 
                 <div class="section-title">Facebook Configuration</div>
@@ -178,6 +195,10 @@
                         </label>
                     </div>
                     <div class="field-help">Extract from browser cookies. <a href="/help#tiktok" target="_blank">Step-by-step guide</a></div>
+                    <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
+                        <button type="button" id="testTikTok" style="width: auto; padding: 10px 16px;">Test session</button>
+                        <span id="ttTestResult" style="color: #555;"></span>
+                    </div>
                 </div>
 
                 <button type="submit">Save Configuration</button>
@@ -209,6 +230,33 @@
                 }
             });
         }
+
+        async function testEndpoint(btnId, resultId, endpoint) {
+            const btn = document.getElementById(btnId);
+            const result = document.getElementById(resultId);
+            if (!btn) return;
+            btn.addEventListener('click', async () => {
+                result.textContent = 'Testing…';
+                try {
+                    const resp = await fetch(endpoint, { method: 'POST' });
+                    const data = await resp.json();
+                    if (data.success) {
+                        const extra = data.data && data.data.username ? ` (@${data.data.username})` : '';
+                        result.textContent = `OK${extra} — ${data.message}`;
+                        result.style.color = '#155724';
+                    } else {
+                        result.textContent = `Failed: ${data.message}`;
+                        result.style.color = '#721c24';
+                    }
+                } catch (e) {
+                    result.textContent = `Error: ${e}`;
+                    result.style.color = '#721c24';
+                }
+            });
+        }
+
+        testEndpoint('testInstagram', 'igTestResult', '/api/test/instagram');
+        testEndpoint('testTikTok', 'ttTestResult', '/api/test/tiktok');
     </script>
 </body>
 </html>

@@ -46,6 +46,49 @@
         .btn-del:hover { background: #c53030; }
         .btn-pub { background: #38a169; }
         .btn-pub:hover { background: #2f855a; }
+
+        /* Publish Modal */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: white; border-radius: 12px; padding: 30px;
+            width: 460px; max-width: 95vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.2s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal h2 { margin: 0 0 20px; font-size: 1.3rem; color: #102a43; }
+        .modal label { display: block; font-weight: 600; color: #334e68; margin-bottom: 6px; font-size: 14px; }
+        .modal textarea {
+            width: 100%; box-sizing: border-box; height: 90px;
+            border: 1px solid #cbd5e0; border-radius: 6px; padding: 10px;
+            font-size: 14px; resize: vertical; font-family: inherit;
+        }
+        .modal textarea:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.15); }
+        .platform-checks { display: flex; gap: 20px; margin: 18px 0; flex-wrap: wrap; }
+        .platform-checks label {
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 500; font-size: 15px; cursor: pointer;
+        }
+        .platform-checks input[type=checkbox] { width: 17px; height: 17px; cursor: pointer; accent-color: #007bff; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+        .btn-publish-confirm {
+            flex: 1; padding: 11px; background: linear-gradient(135deg,#38a169,#276749);
+            color: white; border: none; border-radius: 6px; font-size: 15px;
+            font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+        }
+        .btn-publish-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-cancel {
+            padding: 11px 20px; background: #e2e8f0; color: #334e68;
+            border: none; border-radius: 6px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn-cancel:hover { background: #cbd5e0; }
+        #publishStatus { margin-top: 12px; font-size: 14px; min-height: 20px; text-align: center; }
     </style>
 </head>
 <body>
@@ -58,6 +101,7 @@
         <a href="/logs" class="nav-link">Server Logs</a>
         <a href="/about" class="nav-link">About / Docs</a>
         <a href="/help" class="nav-link">Setup Guide</a>
+        <a href="/manual" class="nav-link">User Manual</a>
     </div>
     
     <div class="main">
@@ -75,7 +119,7 @@
                     </video>
                     <div class="filename">{{ video }}</div>
                     <div class="actions">
-                        <button class="btn-sm btn-pub" onclick="publishVideo('{{ video }}')">Publish</button>
+                        <button class="btn-sm btn-pub" onclick="openPublishModal('{{ video }}')">Publish</button>
                         <button class="btn-sm btn-del" onclick="deleteAsset('{{ video }}', 'video')">Delete</button>
                     </div>
                 </div>
@@ -106,38 +150,108 @@
         </div>
     </div>
 
+    <!-- Publish Options Modal -->
+    <div class="modal-overlay" id="publishModal">
+        <div class="modal">
+            <h2>📤 Publishing Options</h2>
+            <label for="pubCaption">Caption</label>
+            <textarea id="pubCaption">Check out this custom reel! #AleppoGift</textarea>
+
+            <label style="margin-top:16px;">Platforms</label>
+            <div class="platform-checks">
+                <label><input type="checkbox" id="chk_insta" checked> 📸 Instagram</label>
+                <label><input type="checkbox" id="chk_fb" checked> 👍 Facebook</label>
+                <label><input type="checkbox" id="chk_tiktok"> 🎵 TikTok</label>
+            </div>
+
+            <div id="publishStatus"></div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closePublishModal()">Cancel</button>
+                <button class="btn-publish-confirm" id="confirmPublishBtn" onclick="confirmPublish()">Publish Now</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        async function deleteAsset(filename, type) {
-            if (!confirm("Are you sure you want to delete this file?")) return;
-            
-            try {
-                // Determine API endpoint behavior. We updated /api/image/delete to take 'type'
-                const response = await fetch(`/api/image/delete?filename=${encodeURIComponent(filename)}&type=${type}`, { method: 'DELETE' });
-                const data = await response.json();
-                if (data.success) {
-                    location.reload(); 
-                } else {
-                    alert("Error: " + data.message);
-                }
-            } catch(e) {
-                alert("Error: " + e);
-            }
+        let _pendingFilename = null;
+
+        function openPublishModal(filename) {
+            _pendingFilename = filename;
+            document.getElementById('publishStatus').textContent = '';
+            document.getElementById('pubCaption').value = 'Check out this custom reel! #AleppoGift';
+            document.getElementById('chk_insta').checked = true;
+            document.getElementById('chk_fb').checked = true;
+            document.getElementById('chk_tiktok').checked = false;
+            document.getElementById('confirmPublishBtn').disabled = false;
+            document.getElementById('confirmPublishBtn').textContent = 'Publish Now';
+            document.getElementById('publishModal').classList.add('open');
         }
 
-        async function publishVideo(filename) {
-            if (!confirm("Publish this video to all configured platforms?")) return;
-            
+        function closePublishModal() {
+            document.getElementById('publishModal').classList.remove('open');
+            _pendingFilename = null;
+        }
+
+        // Close when clicking outside modal
+        document.getElementById('publishModal').addEventListener('click', function(e) {
+            if (e.target === this) closePublishModal();
+        });
+
+        async function confirmPublish() {
+            const platforms = [];
+            if (document.getElementById('chk_insta').checked) platforms.push('instagram');
+            if (document.getElementById('chk_fb').checked) platforms.push('facebook');
+            if (document.getElementById('chk_tiktok').checked) platforms.push('tiktok');
+
+            if (platforms.length === 0) {
+                document.getElementById('publishStatus').innerHTML = '<span style="color:#e53e3e">Please select at least one platform.</span>';
+                return;
+            }
+
+            const caption = document.getElementById('pubCaption').value.trim() || 'Check out this custom reel! #AleppoGift';
+            const btn = document.getElementById('confirmPublishBtn');
+            btn.disabled = true;
+            btn.textContent = 'Publishing...';
+            document.getElementById('publishStatus').innerHTML = '<span style="color:#888">Sending...</span>';
+
             try {
                 const response = await fetch('/api/editor/publish', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        video_filename: filename, 
-                        platforms: ['instagram', 'facebook'] // Defaulting to common ones
+                    body: JSON.stringify({
+                        video_filename: _pendingFilename,
+                        caption: caption,
+                        platforms: platforms
                     })
                 });
                 const data = await response.json();
-                alert(data.message);
+                if (data.success) {
+                    document.getElementById('publishStatus').innerHTML = `<span style="color:#38a169">✅ ${data.message}</span>`;
+                    btn.textContent = 'Done!';
+                    setTimeout(closePublishModal, 2000);
+                } else {
+                    document.getElementById('publishStatus').innerHTML = `<span style="color:#e53e3e">❌ ${data.message}</span>`;
+                    btn.disabled = false;
+                    btn.textContent = 'Publish Now';
+                }
+            } catch(e) {
+                document.getElementById('publishStatus').innerHTML = `<span style="color:#e53e3e">❌ Error: ${e}</span>`;
+                btn.disabled = false;
+                btn.textContent = 'Publish Now';
+            }
+        }
+
+        async function deleteAsset(filename, type) {
+            if (!confirm("Are you sure you want to delete this file?")) return;
+            try {
+                const response = await fetch(`/api/image/delete?filename=${encodeURIComponent(filename)}&type=${type}`, { method: 'DELETE' });
+                const data = await response.json();
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert("Error: " + data.message);
+                }
             } catch(e) {
                 alert("Error: " + e);
             }

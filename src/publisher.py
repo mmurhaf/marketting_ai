@@ -48,8 +48,14 @@ class SocialPublisher:
 
         # SIMULATION
         if not username or username == 'Guest':
-            print("Warning: No Instagram username configured in settings.")
-        
+            print("Error: No Instagram username configured in settings.")
+            return False
+
+        password = self.config.get('instagram_password', '')
+        if not password:
+            print("Error: No Instagram password configured in settings.")
+            return False
+
         print(f"Authenticating as {username}...")
         time.sleep(1)
         print("Uploading...")
@@ -68,6 +74,22 @@ class SocialPublisher:
         print(f"--- ATTEMPTING TO PUBLISH TO FACEBOOK (Token: {masked_token}) ---")
         print(f"Video: {video_path}")
         print(f"Caption: {caption}")
+
+        # Check file existence
+        if isinstance(video_path, list):
+            for mp in video_path:
+                if not os.path.exists(mp):
+                    print(f"Error: File not found: {mp}")
+                    return False
+        else:
+            if not os.path.exists(video_path):
+                print("Error: Media file not found.")
+                return False
+
+        if not token:
+            print("Error: No Facebook access token configured in settings.")
+            return False
+
         # SIMULATION
         time.sleep(1)
         print("Published successfully!")
@@ -83,10 +105,22 @@ class SocialPublisher:
         print(f"--- ATTEMPTING TO PUBLISH TO TIKTOK (Session: {masked_session}) ---")
         print(f"Video: {video_path}")
         print(f"Caption: {caption}")
-        
+
+        # Check file existence
+        if isinstance(video_path, list):
+            for mp in video_path:
+                if not os.path.exists(mp):
+                    print(f"Error: File not found: {mp}")
+                    return False
+        else:
+            if not os.path.exists(video_path):
+                print("Error: Media file not found.")
+                return False
+
         if not session_id:
-            print("Warning: No TikTok session ID configured in settings.")
-        
+            print("Error: No TikTok session ID configured in settings.")
+            return False
+
         # SIMULATION
         print("Authenticating...")
         time.sleep(1)

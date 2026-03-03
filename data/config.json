@@ -1,7 +1,11 @@
 {
     "image_source_url": "https://aleppogift.com/",
+    "scrape_limit": "5",
+    "default_caption": "Check out our new collection! #aleppogift",
     "instagram_username": "",
+    "instagram_business_account_id": "",
+    "facebook_page_id": "",
     "instagram_password": "",
-    "facebook_page_access_token": "",
-    "schedule_time": "10:00"
+    "facebook_access_token": "",
+    "tiktok_session_id": "1f521c4fd682428598bbaeb1f9395c6a"
 }

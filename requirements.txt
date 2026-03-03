@@ -3,3 +3,5 @@ beautifulsoup4
 moviepy<2.0
 schedule
 flask
+Pillow
+markdown

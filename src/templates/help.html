@@ -161,8 +161,8 @@
         <a href="/settings" class="nav-link">Settings</a>
         <a href="/logs" class="nav-link">Server Logs</a>
         <a href="/about" class="nav-link">About / Docs</a>
-        <a href="/about" class="nav-link">About / Docs</a>
         <a href="/help" class="nav-link active">Setup Guide</a>
+        <a href="/manual" class="nav-link">User Manual</a>
     </div>
 
     <div class="container">
@@ -227,9 +227,10 @@
                     <span class="step-number">3</span>
                     <strong>Create Facebook App</strong>
                     <ul>
-                        <li>Go to <a href="https://developers.facebook.com/apps/" target="_blank">Meta for Developers > My Apps</a></li>
-                        <li>Click "Create App" → Select "Business" type</li>
-                        <li>Fill in app details and create.</li>
+                        <li>Go directly to <a href="https://developers.facebook.com/apps/" target="_blank">developers.facebook.com/apps</a> (do <strong>not</strong> use business.facebook.com)</li>
+                        <li>Click <strong>"Create App"</strong></li>
+                        <li>When asked for a use case, choose <strong>"Other"</strong> and then select type <strong>"Business"</strong></li>
+                        <li>Fill in App Name and Contact Email, then click <strong>"Create App"</strong></li>
                     </ul>
                 </div>
 
@@ -237,8 +238,9 @@
                     <span class="step-number">4</span>
                     <strong>Add Products</strong>
                     <ul>
-                        <li>In your app dashboard, find "Instagram Graph API" and click "Set Up".</li>
-                        <li>(Optional) Add "Facebook Login for Business" if asked, but Graph API is the key one.</li>
+                        <li>In your app dashboard, click <strong>"Add Product"</strong></li>
+                        <li>Find <strong>"Instagram Graph API"</strong> and click <strong>"Set Up"</strong></li>
+                        <li>Also add <strong>"Facebook Login for Business"</strong> — required for token generation</li>
                     </ul>
                 </div>
 
@@ -259,19 +261,21 @@
                     <span class="step-number">6</span>
                     <strong>Get Instagram Business Account ID</strong>
                     <ul>
-                        <li>In the Graph API Explorer query box, enter: <code>me?fields=instagram_business_account</code></li>
-                        <li>Click "Submit".</li>
-                        <li>Copy the ID from the response (inside <code>instagram_business_account: { id: "..." }</code>).</li>
+                        <li>In the Graph API Explorer, first find your Page ID by querying: <code>me/accounts</code> — note the <code>id</code> of your page</li>
+                        <li>Then query: <code>{your-page-id}?fields=instagram_business_account</code></li>
+                        <li>Click <strong>"Submit"</strong>.</li>
+                        <li>Copy the ID from the response: <code>instagram_business_account: { "id": "123..." }</code></li>
                     </ul>
                 </div>
 
                 <div class="step">
                     <span class="step-number">7</span>
-                    <strong>Extend Token (Recommended)</strong>
+                    <strong>About Token Expiry</strong>
                     <ul>
-                        <li>Click the "i" info icon next to your token in the Explorer.</li>
-                        <li>Click "Open in Access Token Tool".</li>
-                        <li>Click "Extend Access Token" to get a 60-day token.</li>
+                        <li><strong>Page Access Tokens</strong> generated via Graph API Explorer are <strong>short-lived (~1 hour)</strong>.</li>
+                        <li>To get a long-lived Page token: click the <strong>ℹ️ info icon</strong> next to your token → <strong>"Open in Access Token Tool"</strong> → <strong>"Extend Access Token"</strong>.</li>
+                        <li>This gives you a long-lived User token (~60 days). Exchange it for a <strong>permanent Page token</strong> by querying: <code>/{page-id}?fields=access_token&access_token={long-lived-user-token}</code></li>
+                        <li><strong>Page Access Tokens are never-expiring</strong> if generated from a long-lived User token.</li>
                     </ul>
                 </div>
 
@@ -334,10 +338,10 @@
                     <span class="step-number">2</span>
                     <strong>Create Facebook App (if not already done)</strong>
                     <ul>
-                        <li>Go to <a href="https://developers.facebook.com/" target="_blank">developers.facebook.com</a></li>
-                        <li>Click "My Apps" → "Create App"</li>
-                        <li>Choose "Business" type</li>
-                        <li>Fill in details and create</li>
+                        <li>Go to <a href="https://developers.facebook.com/apps/" target="_blank">developers.facebook.com/apps</a> (do <strong>not</strong> use business.facebook.com — you may get an access-denied error there)</li>
+                        <li>Click <strong>"Create App"</strong></li>
+                        <li>Select use case <strong>"Other"</strong> → type <strong>"Business"</strong></li>
+                        <li>Fill in App Name and Contact Email, then click <strong>"Create App"</strong></li>
                     </ul>
                 </div>
 
@@ -345,8 +349,9 @@
                     <span class="step-number">3</span>
                     <strong>Add Required Products</strong>
                     <ul>
-                        <li>In app dashboard, add "Facebook Login"</li>
-                        <li>Add "Graph API" if not already added</li>
+                        <li>In app dashboard, click <strong>"Add Product"</strong></li>
+                        <li>Add <strong>"Facebook Login for Business"</strong> (required for token generation)</li>
+                        <li>There is no separate "Graph API" product — it is available by default</li>
                     </ul>
                 </div>
 
@@ -365,28 +370,32 @@
 
                 <div class="step">
                     <span class="step-number">5</span>
-                    <strong>Make Token Long-Lived (Recommended)</strong>
+                    <strong>Get a Permanent Page Access Token (Recommended)</strong>
                     <ul>
-                        <li>Go to <a href="https://developers.facebook.com/tools/debug/accesstoken/" target="_blank">Access Token Debugger</a></li>
-                        <li>Paste your token and click "Debug"</li>
-                        <li>Click "Extend Access Token" to get a 60-day token</li>
-                        <li>Copy the new extended token</li>
+                        <li>The token from Graph API Explorer is short-lived (~1 hour).</li>
+                        <li>In the Explorer, click the <strong>ℹ️ info icon</strong> next to your token → <strong>"Open in Access Token Tool"</strong></li>
+                        <li>Click <strong>"Extend Access Token"</strong> — this creates a long-lived User token (~60 days)</li>
+                        <li>Copy the extended token, then query: <code>/{your-page-id}?fields=access_token&access_token={extended-token}</code></li>
+                        <li>The <code>access_token</code> in the response is your <strong>never-expiring Page Access Token</strong></li>
                     </ul>
                 </div>
 
                 <div class="success">
-                    ✅ Paste the Page Access Token in the <strong>Facebook Access Token</strong> field on the Settings page.
+                    ✅ Paste the <strong>Page Access Token</strong> in the <strong>Facebook Access Token</strong> field on the Settings page.
                     <br><br>
-                    💡 <strong>Tip:</strong> After saving, use the "Test token" button to verify it works!
+                    💡 <strong>Tip:</strong> After saving, use the "Test token" button to verify it works!<br>
+                    💡 <strong>Shortcut:</strong> If you already generated a token for Instagram (Method 1 above), use that same token here — no need to create a new one.
                 </div>
             </div>
 
             <div class="note">
                 <strong>Token Permissions Required:</strong>
                 <ul style="margin: 10px 0 0 0;">
-                    <li><code>pages_manage_posts</code> - Publish posts to your page</li>
+                    <li><code>pages_manage_posts</code> - Publish photo/text posts to your page</li>
                     <li><code>pages_read_engagement</code> - Read engagement metrics</li>
-                    <li><code>publish_video</code> - Upload video content</li>
+                    <li><code>publish_video</code> - Upload video content to Facebook</li>
+                    <li><code>instagram_basic</code> - Read Instagram account info</li>
+                    <li><code>instagram_content_publish</code> - Publish content to Instagram</li>
                 </ul>
             </div>
 

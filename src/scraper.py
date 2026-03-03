@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import os
 import hashlib
 import json
+import datetime
 from urllib.parse import urljoin, urlparse
 
 class ImageScraper:
@@ -120,7 +121,7 @@ class ImageScraper:
                         "title": title,
                         "description": description,
                         "source_url": img_url,
-                        "timestamp": str(os.path.getctime(filename))
+                        "timestamp": datetime.datetime.utcnow().isoformat() + 'Z'
                     }
                     
                     self.downloaded_hashes.add(img_hash)

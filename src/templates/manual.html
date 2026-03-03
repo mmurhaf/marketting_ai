@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Manual - Marketing AI</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0; background: #eaeff5; display: flex; height: 100vh; color: #334e68;
+        }
+
+        /* ── Sidebar ─────────────────────────────────────────── */
+        .sidebar {
+            width: 250px; background: #fff; border-right: 1px solid #dae1e7;
+            padding: 20px; display: flex; flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.02); z-index: 10;
+            overflow-y: auto;
+        }
+        .sidebar h2 { color: #102a43; margin-top: 0; font-weight: 700; letter-spacing: -0.5px; }
+        .nav-link {
+            display: block; padding: 12px 15px; margin-bottom: 5px;
+            text-decoration: none; color: #486581; border-radius: 6px;
+            transition: all 0.2s ease; font-weight: 500;
+        }
+        .nav-link:hover { background: #f0f4f8; color: #102a43; transform: translateX(3px); }
+        .nav-link.active {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white; box-shadow: 0 4px 6px rgba(0,123,255,0.2);
+        }
+
+        /* sidebar TOC */
+        .toc-sidebar { margin-top: 25px; border-top: 1px solid #e1e8ef; padding-top: 15px; }
+        .toc-sidebar p { font-size: 11px; font-weight: 700; text-transform: uppercase;
+            color: #829ab1; letter-spacing: 0.05em; margin: 0 0 10px 0; }
+        .toc-sidebar a {
+            display: block; padding: 6px 10px; font-size: 13px; color: #627d98;
+            text-decoration: none; border-radius: 4px; transition: all 0.15s;
+        }
+        .toc-sidebar a:hover { background: #f0f4f8; color: #102a43; }
+
+        /* ── Main content ─────────────────────────────────────── */
+        .main {
+            flex: 1; padding: 40px 50px; overflow-y: auto;
+            background-image: radial-gradient(#dceefb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+            color: white; padding: 40px; border-radius: 16px; margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,123,255,0.3);
+        }
+        .hero h1 { margin: 0 0 10px; font-size: 2.2rem; letter-spacing: -1px; }
+        .hero p  { margin: 0; opacity: 0.9; font-size: 1.05rem; line-height: 1.6; }
+
+        /* Section cards */
+        .section {
+            background: #fff; border-radius: 12px; padding: 35px 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px;
+            border-left: 5px solid #007bff;
+        }
+        .section.green  { border-left-color: #28a745; }
+        .section.purple { border-left-color: #6610f2; }
+        .section.orange { border-left-color: #fd7e14; }
+        .section.teal   { border-left-color: #20c997; }
+        .section.red    { border-left-color: #dc3545; }
+
+        h2 {
+            margin-top: 0; font-size: 1.5rem; color: #102a43;
+            display: flex; align-items: center; gap: 10px;
+        }
+        h3 { color: #334e68; margin: 25px 0 10px; font-size: 1.1rem; }
+        p  { line-height: 1.7; color: #486581; margin: 0 0 14px; }
+        p:last-child { margin-bottom: 0; }
+
+        /* Workflow steps */
+        .steps { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
+        .step {
+            display: flex; align-items: flex-start; gap: 12px;
+            background: #f8fafc; border: 1px solid #dae1e7;
+            border-radius: 10px; padding: 16px 18px; flex: 1; min-width: 200px;
+        }
+        .step-num {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px; flex-shrink: 0;
+        }
+        .step-body strong { display: block; color: #102a43; margin-bottom: 4px; }
+        .step-body span   { font-size: 13px; color: #627d98; line-height: 1.5; }
+
+        /* Feature rows */
+        .feature-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px; margin-top: 16px;
+        }
+        .feat {
+            background: #f8fafc; border: 1px solid #dae1e7; border-radius: 8px; padding: 18px;
+        }
+        .feat .feat-icon { font-size: 22px; margin-bottom: 8px; }
+        .feat strong { display: block; color: #102a43; margin-bottom: 5px; font-size: 0.95rem; }
+        .feat span   { font-size: 13px; color: #627d98; line-height: 1.5; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+        th { background: #f0f4f8; color: #334e68; padding: 10px 14px; text-align: left; font-weight: 600; }
+        td { padding: 10px 14px; border-bottom: 1px solid #e1e8ef; color: #486581; vertical-align: top; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8fafc; }
+
+        /* Callout boxes */
+        .note    { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 16px 0; color: #1e40af; font-size: 14px; line-height: 1.6; }
+        .tip     { background: #dcfce7; border-left: 4px solid #22c55e; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 16px 0; color: #15803d; font-size: 14px; line-height: 1.6; }
+        .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 16px 0; color: #92400e; font-size: 14px; line-height: 1.6; }
+        .danger  { background: #fee2e2; border-left: 4px solid #ef4444; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 16px 0; color: #991b1b; font-size: 14px; line-height: 1.6; }
+
+        /* Kbd / inline code */
+        kbd, code {
+            background: #eef2ff; color: #4338ca; padding: 2px 7px;
+            border-radius: 4px; font-family: 'Consolas', 'Fira Code', monospace;
+            font-size: 13px;
+        }
+
+        /* Buttons in manual (non-interactive, just visual) */
+        .btn-demo {
+            display: inline-block; padding: 6px 14px; border-radius: 5px;
+            font-size: 13px; font-weight: 600; color: white; background: #007bff;
+            margin: 2px 0; vertical-align: middle;
+        }
+        .btn-demo.green  { background: #28a745; }
+        .btn-demo.red    { background: #dc3545; }
+        .btn-demo.orange { background: #fd7e14; }
+
+        /* Back-to-top */
+        a.top-link { font-size: 12px; color: #829ab1; text-decoration: none; float: right; margin-top: 6px; }
+        a.top-link:hover { color: #007bff; }
+
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        ul li, ol li { margin-bottom: 7px; line-height: 1.6; color: #486581; }
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════════ SIDEBAR ════════════════════════ -->
+<div class="sidebar">
+    <h2>Marketing AI</h2>
+    <a href="/"        class="nav-link">Dashboard</a>
+    <a href="/editor"  class="nav-link">Editor</a>
+    <a href="/gallery" class="nav-link">Gallery</a>
+    <a href="/settings"class="nav-link">Settings</a>
+    <a href="/logs"    class="nav-link">Server Logs</a>
+    <a href="/about"   class="nav-link">About / Docs</a>
+    <a href="/help"    class="nav-link">Setup Guide</a>
+    <a href="/manual"  class="nav-link active">User Manual</a>
+
+    <div class="toc-sidebar">
+        <p>On this page</p>
+        <a href="#overview">Overview</a>
+        <a href="#workflow">Typical Workflow</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#editor">Editor</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#settings">Settings</a>
+        <a href="#uploading">Uploading Files</a>
+        <a href="#music">Background Music</a>
+        <a href="#logs">Server Logs</a>
+        <a href="#headless">Headless / Auto Mode</a>
+        <a href="#troubleshoot">Troubleshooting</a>
+    </div>
+</div>
+
+<!-- ════════════════════════ MAIN ════════════════════════ -->
+<div class="main">
+
+    <!-- Hero -->
+    <div class="hero" id="top">
+        <h1>📖 User Manual</h1>
+        <p>Everything you need to know to run your social media marketing pipeline —
+           from scraping product images to publishing reels on Instagram, Facebook, and TikTok.</p>
+    </div>
+
+    <!-- ── OVERVIEW ────────────────────────────────────────── -->
+    <div class="section" id="overview">
+        <h2>🌐 What This System Does</h2>
+        <p>Marketing AI is a self-hosted automation tool with a browser-based dashboard. It handles the full content pipeline for social media:</p>
+
+        <div class="feature-grid">
+            <div class="feat">
+                <div class="feat-icon">🕷️</div>
+                <strong>Scrape Images</strong>
+                <span>Automatically download product images from your website. Duplicate images are detected and skipped using MD5 hashing.</span>
+            </div>
+            <div class="feat">
+                <div class="feat-icon">🎬</div>
+                <strong>Create Reels</strong>
+                <span>Turn scraped images into 9:16 portrait MP4 videos (1080×1920) with fade transitions and optional background music.</span>
+            </div>
+            <div class="feat">
+                <div class="feat-icon">🖼️</div>
+                <strong>Create Post Images</strong>
+                <span>Generate 1:1 square images (1080×1080) with text overlays (title + description) for carousel posts.</span>
+            </div>
+            <div class="feat">
+                <div class="feat-icon">📤</div>
+                <strong>Publish to Social Media</strong>
+                <span>Send your content to Instagram, Facebook, and TikTok directly from the browser. Choose platforms and write a caption per post.</span>
+            </div>
+            <div class="feat">
+                <div class="feat-icon">🎵</div>
+                <strong>Background Music</strong>
+                <span>Upload MP3/WAV/OGG files and attach them to reels. Batch-add music to all silent videos with one button.</span>
+            </div>
+            <div class="feat">
+                <div class="feat-icon">⚙️</div>
+                <strong>Configurable & Schedulable</strong>
+                <span>All credentials and settings live in one place. Run entirely headless on a schedule with no browser needed.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── WORKFLOW ────────────────────────────────────────── -->
+    <div class="section green" id="workflow">
+        <h2>🔄 Typical Daily Workflow <a class="top-link" href="#top">↑ top</a></h2>
+        <p>Follow these steps in order each time you want to post new content:</p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                    <strong>Scrape new images</strong>
+                    <span>Dashboard → <em>Run Scraper Now</em>, or Editor → upload your own images.</span>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                    <strong>Select images</strong>
+                    <span>Open the <a href="/editor">Editor</a>, tick the images you want to use.</span>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                    <strong>Choose output type</strong>
+                    <span>Pick <em>Reel</em> (video) or <em>Post</em> (image). Optionally select a music track.</span>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-body">
+                    <strong>Create &amp; preview</strong>
+                    <span>Click <em>Create</em>. Preview the result in the right panel.</span>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">5</div>
+                <div class="step-body">
+                    <strong>Write caption &amp; publish</strong>
+                    <span>Check your platforms, type a caption, and click <em>Publish</em>.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tip">
+            <strong>Tip — Let the automation do it all:</strong> If you just want everything to run automatically, click
+            <strong>Run Scraper Now → Create Reel Now → Publish Latest Reel</strong> on the Dashboard one after the other.
+            Or use <a href="#headless">headless mode</a> to run the entire pipeline on a schedule.
+        </div>
+    </div>
+
+    <!-- ── DASHBOARD ────────────────────────────────────────── -->
+    <div class="section" id="dashboard">
+        <h2>🏠 Dashboard <a class="top-link" href="#top">↑ top</a></h2>
+        <p>The Dashboard (<code>/</code>) is the quick-action control panel. All buttons post to the server and show the result in the <strong>Live Status</strong> console at the bottom.</p>
+
+        <h3>Quick Actions</h3>
+        <table>
+            <thead><tr><th>Button</th><th>What it does</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="btn-demo">Run Scraper Now</span></td>
+                    <td>Visits your configured <em>Image Source URL</em> and downloads up to <em>N</em> new product images (configurable in Settings). Already-downloaded images are skipped automatically.</td>
+                </tr>
+                <tr>
+                    <td><span class="btn-demo">Create Reel Now</span></td>
+                    <td>Randomly selects up to 5 images from the image library and generates a 9:16 MP4 reel with a fade transition. Background music is added automatically if any music files are uploaded.</td>
+                </tr>
+                <tr>
+                    <td><span class="btn-demo green">Publish Latest Reel</span></td>
+                    <td>Finds the most recently modified video in <code>assets/output/</code> and publishes it to <strong>Instagram</strong> and <strong>Facebook</strong> using your configured credentials and default caption.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Tools</h3>
+        <table>
+            <thead><tr><th>Button</th><th>What it does</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="btn-demo orange">Auto-Add Music to Silent Videos</span></td>
+                    <td>Scans every video in <code>assets/output/</code>, detects ones without an audio track, and merges a randomly chosen music file from <code>assets/music/</code>. The new file is saved with a <code>_music</code> suffix so the original is preserved.</td>
+                </tr>
+                <tr>
+                    <td><span class="btn-demo red">Restart Server</span></td>
+                    <td>Gracefully relaunches the Flask server process. Use this after editing config files manually. Wait ~5–10 seconds then refresh the page.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="note">
+            The <strong>Live Status</strong> box at the bottom logs every action's output in real time. If an action fails, the error message is shown there.
+        </div>
+    </div>
+
+    <!-- ── EDITOR ────────────────────────────────────────── -->
+    <div class="section purple" id="editor">
+        <h2>✏️ Editor <a class="top-link" href="#top">↑ top</a></h2>
+        <p>The Editor (<code>/editor</code>) gives you full control over content creation. It is split into two columns: <strong>image selection</strong> on the left, <strong>creation &amp; publishing</strong> on the right.</p>
+
+        <h3>Step 1 — Select Images</h3>
+        <ul>
+            <li>All images in <code>assets/images/</code> are shown in the grid.</li>
+            <li>Click a thumbnail (or its checkbox) to <strong>select</strong> it. Selected images get a blue border. Click again to deselect.</li>
+            <li>Use <strong>Load More</strong> to page through large libraries.</li>
+            <li>Click <strong>+ Upload Images</strong> to upload your own images from your computer (JPG, PNG, GIF accepted).</li>
+            <li>Click the red <strong>✕</strong> button on any image to permanently delete it from the server.</li>
+        </ul>
+
+        <h3>Step 2 — Choose Output Type</h3>
+        <table>
+            <thead><tr><th>Type</th><th>Output format</th><th>Best for</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Reel (Video)</strong></td><td>MP4, 1080×1920, 24 fps</td><td>Instagram Reels, TikTok, Facebook Reels</td></tr>
+                <tr><td><strong>Post (Image)</strong></td><td>JPG, 1080×1080</td><td>Instagram Feed, Facebook Posts</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Step 2b — Background Music (Reels only)</h3>
+        <ul>
+            <li>The <strong>Music</strong> dropdown lists all files in <code>assets/music/</code>.</li>
+            <li>Select a track or leave it on <em>Auto (Random)</em> to let the system pick one.</li>
+            <li>To add music files, click <strong>+ Upload Music</strong> (MP3, WAV, OGG accepted).</li>
+        </ul>
+
+        <h3>Step 3 — Create</h3>
+        <p>Click <span class="btn-demo">Create Reel</span> or <span class="btn-demo">Create Post</span>. The server generates the file and the preview panel on the right shows the result. Reel generation may take 30–60 seconds depending on image count and hardware.</p>
+
+        <h3>Step 4 — Publish</h3>
+        <ul>
+            <li>Check one or more <strong>platforms</strong> (Instagram, Facebook, TikTok).</li>
+            <li>Edit the <strong>Caption</strong> text area — it is pre-filled with your default caption from Settings.</li>
+            <li>Click <span class="btn-demo green">Publish</span>. Results appear immediately below the button.</li>
+        </ul>
+
+        <div class="warning">
+            <strong>Publishing simulation:</strong> Until you implement real API credentials in <code>publisher.py</code>, publishing will simulate the upload. See the <a href="/help">Setup Guide</a> to connect real accounts.
+        </div>
+    </div>
+
+    <!-- ── GALLERY ────────────────────────────────────────── -->
+    <div class="section orange" id="gallery">
+        <h2>🖼️ Gallery <a class="top-link" href="#top">↑ top</a></h2>
+        <p>The Gallery (<code>/gallery</code>) shows every asset on the server in two sections:</p>
+
+        <table>
+            <thead><tr><th>Section</th><th>Source folder</th><th>File types shown</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Downloaded Images</strong></td><td><code>assets/images/</code></td><td>JPG, JPEG, PNG</td></tr>
+                <tr><td><strong>Generated Videos</strong></td><td><code>assets/output/</code></td><td>MP4</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Actions per asset</h3>
+        <ul>
+            <li><span class="btn-demo green">Publish</span> — Opens a mini publish dialog: choose platforms and caption, then publish directly from the Gallery.</li>
+            <li><span class="btn-demo red">Delete</span> — Permanently removes the file from the server. <strong>This cannot be undone.</strong></li>
+        </ul>
+    </div>
+
+    <!-- ── SETTINGS ────────────────────────────────────────── -->
+    <div class="section teal" id="settings">
+        <h2>⚙️ Settings <a class="top-link" href="#top">↑ top</a></h2>
+        <p>All configuration is done on the Settings page (<code>/settings</code>). Changes take effect immediately after saving — no restart needed.</p>
+
+        <h3>Source Configuration</h3>
+        <table>
+            <thead><tr><th>Field</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Image Source URL</strong></td><td>The website the scraper will visit when you click <em>Run Scraper Now</em>. Any publicly accessible URL works. Default: <code>https://aleppogift.com/</code></td></tr>
+                <tr><td><strong>Images to Scrape Per Run</strong></td><td>Maximum new images downloaded per scrape run. Increase if your site has many new products. Default: <code>5</code></td></tr>
+            </tbody>
+        </table>
+
+        <h3>Content Defaults</h3>
+        <table>
+            <thead><tr><th>Field</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Default Post Caption</strong></td><td>Pre-filled caption used by Dashboard quick-publish and the Editor. You can always override it per post in the Editor.</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Platform Credentials</h3>
+        <table>
+            <thead><tr><th>Field</th><th>Used for</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Instagram Username / Password</strong></td><td>Unofficial instagrapi method (personal accounts). Not recommended for production.</td></tr>
+                <tr><td><strong>Instagram Business Account ID</strong></td><td>Official Graph API method. Required alongside the Facebook Access Token.</td></tr>
+                <tr><td><strong>Facebook Page ID</strong></td><td>Numeric ID of your Facebook Page.</td></tr>
+                <tr><td><strong>Facebook Page Access Token</strong></td><td>Long-lived token from Meta for Developers. Click <strong>Test token</strong> to verify it.</td></tr>
+                <tr><td><strong>TikTok Session ID</strong></td><td>Value of the <code>sessionid</code> cookie from your browser (unofficial method).</td></tr>
+            </tbody>
+        </table>
+
+        <div class="note">
+            <strong>Security:</strong> Passwords and tokens are stored server-side in <code>data/config.json</code> and are <em>never</em> sent back to the browser after saving.
+            Use the <strong>"Clear saved …"</strong> checkbox next to each secret field to remove it.
+        </div>
+
+        <p>For step-by-step instructions on obtaining each credential, see the <a href="/help">Setup Guide</a>.</p>
+    </div>
+
+    <!-- ── UPLOADING ───────────────────────────────────────── -->
+    <div class="section" id="uploading">
+        <h2>📂 Uploading Your Own Files <a class="top-link" href="#top">↑ top</a></h2>
+
+        <h3>Upload images</h3>
+        <ol>
+            <li>Go to the <a href="/editor">Editor</a>.</li>
+            <li>Click <strong>+ Upload Images</strong> (top-right of the image grid).</li>
+            <li>Select one or more image files (JPG, PNG, GIF).</li>
+            <li>The images are saved to <code>assets/images/</code> and appear in the grid immediately.</li>
+        </ol>
+
+        <h3>Upload music</h3>
+        <ol>
+            <li>Go to the <a href="/editor">Editor</a>.</li>
+            <li>Click <strong>+ Upload Music</strong>.</li>
+            <li>Select an audio file (MP3, WAV, or OGG).</li>
+            <li>The file is saved to <code>assets/music/</code> and appears in the music dropdown.</li>
+        </ol>
+
+        <div class="tip">
+            You can also place files directly into <code>assets/images/</code> and <code>assets/music/</code> via your file manager — the server picks them up instantly without a restart.
+        </div>
+    </div>
+
+    <!-- ── MUSIC ───────────────────────────────────────────── -->
+    <div class="section green" id="music">
+        <h2>🎵 Background Music Guide <a class="top-link" href="#top">↑ top</a></h2>
+
+        <p>The system uses background music in two ways:</p>
+
+        <table>
+            <thead><tr><th>Method</th><th>When it's used</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>Auto (random)</strong></td>
+                    <td>When you create a reel and leave the music dropdown on <em>Auto</em>, or use Dashboard → <em>Create Reel Now</em>. A random file from <code>assets/music/</code> is selected.</td>
+                </tr>
+                <tr>
+                    <td><strong>Manual selection</strong></td>
+                    <td>In the Editor, pick a specific track from the dropdown before clicking <em>Create Reel</em>.</td>
+                </tr>
+                <tr>
+                    <td><strong>Batch add</strong></td>
+                    <td>Dashboard → <em>Auto-Add Music to Silent Videos</em> — adds a random track to every video that has no audio, saving new files with a <code>_music</code> suffix.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="note">
+            Music is looped if it is shorter than the video, and fades out over the last 2 seconds. Only files in <code>assets/music/</code> are used — system audio files are not touched.
+        </div>
+    </div>
+
+    <!-- ── LOGS ────────────────────────────────────────────── -->
+    <div class="section" id="logs">
+        <h2>📋 Server Logs <a class="top-link" href="#top">↑ top</a></h2>
+        <p>The Logs page (<code>/logs</code>) shows the rotating Flask server log stored at <code>logs/server.log</code>.</p>
+        <ul>
+            <li>The log captures all HTTP requests, API calls, scraper output, and errors.</li>
+            <li>Log file rotates at <strong>100 KB</strong> (1 backup kept). Older entries are discarded automatically.</li>
+            <li>Refresh the Logs page to see the latest entries — it is not a live stream.</li>
+            <li>If you need to diagnose a failed task, check the log immediately after the failure — the exact Python traceback is recorded.</li>
+        </ul>
+    </div>
+
+    <!-- ── HEADLESS ─────────────────────────────────────────── -->
+    <div class="section purple" id="headless">
+        <h2>🤖 Headless / Scheduled Mode <a class="top-link" href="#top">↑ top</a></h2>
+        <p>Instead of the web dashboard, you can run the entire pipeline automatically on a schedule using <code>main.py</code>.</p>
+
+        <h3>How to start it</h3>
+        <ol>
+            <li>Open a terminal in the project root.</li>
+            <li>Activate your virtual environment: <code>.venv\Scripts\activate</code> (Windows) or <code>source .venv/bin/activate</code> (Linux/macOS).</li>
+            <li>Run: <code>python src/main.py</code></li>
+        </ol>
+
+        <h3>What it does</h3>
+        <ol>
+            <li>Runs <strong>once immediately</strong> on startup.</li>
+            <li>Then repeats every day at <strong>10:00 AM</strong> automatically.</li>
+            <li>Each run: scrapes new images → creates a reel → publishes to Instagram &amp; Facebook.</li>
+        </ol>
+
+        <div class="tip">
+            <strong>Running as a background service:</strong> On Windows you can use <em>Task Scheduler</em> to launch <code>python src/main.py</code> at startup. On Linux, use <code>systemd</code> or <code>cron</code>.
+        </div>
+        <div class="warning">
+            Headless mode uses your saved credentials from <code>data/config.json</code>. Make sure you have configured them via the Settings page before running headless.
+        </div>
+    </div>
+
+    <!-- ── TROUBLESHOOT ──────────────────────────────────────── -->
+    <div class="section red" id="troubleshoot">
+        <h2>🔧 Troubleshooting <a class="top-link" href="#top">↑ top</a></h2>
+
+        <h3>Common issues</h3>
+        <table>
+            <thead><tr><th>Problem</th><th>Likely cause &amp; fix</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>Reel creation fails immediately</strong></td>
+                    <td><code>ffmpeg</code> is not installed or not on your system PATH. Install it from <a href="https://ffmpeg.org/download.html" target="_blank">ffmpeg.org</a> and restart the server.</td>
+                </tr>
+                <tr>
+                    <td><strong>Scraper downloads 0 images</strong></td>
+                    <td>The source URL may block scrapers, or all images are already downloaded (deduplication). Try a different URL, or clear <code>data/history.json</code> to re-download existing images.</td>
+                </tr>
+                <tr>
+                    <td><strong>Publish returns "Failed — no credentials"</strong></td>
+                    <td>Credentials are missing or blank. Go to <a href="/settings">Settings</a>, enter your tokens/passwords, and save. Use the <strong>Test</strong> buttons to verify.</td>
+                </tr>
+                <tr>
+                    <td><strong>Music not added to reel</strong></td>
+                    <td>No files in <code>assets/music/</code>. Upload at least one MP3/WAV/OGG via the Editor.</td>
+                </tr>
+                <tr>
+                    <td><strong>Server won't start — port in use</strong></td>
+                    <td>Another process is already using port 5000. Stop it, or edit the last line of <code>src/server.py</code> to use a different port: <code>app.run(port=5001)</code>.</td>
+                </tr>
+                <tr>
+                    <td><strong>Text is cut off on post images</strong></td>
+                    <td>Titles longer than ~2 lines are wrapped automatically but capped at 2 lines per field. Shorten the title in <code>data/metadata.json</code> or use the <em>Post</em> type with shorter alt text on your source images.</td>
+                </tr>
+                <tr>
+                    <td><strong>Page loads but actions do nothing</strong></td>
+                    <td>Check the <a href="/logs">Server Logs</a> for a Python traceback. A missing dependency is the most common cause — run <code>pip install -r requirements.txt</code>.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Useful file locations</h3>
+        <table>
+            <thead><tr><th>File / Folder</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr><td><code>data/config.json</code></td><td>All settings and credentials (plain JSON — editable by hand)</td></tr>
+                <tr><td><code>data/history.json</code></td><td>MD5 hashes of downloaded images — delete to allow re-downloading</td></tr>
+                <tr><td><code>data/metadata.json</code></td><td>Title, description, source URL for each image</td></tr>
+                <tr><td><code>assets/images/</code></td><td>Raw scraped / uploaded images</td></tr>
+                <tr><td><code>assets/music/</code></td><td>Background music files</td></tr>
+                <tr><td><code>assets/output/</code></td><td>Generated reels and post images</td></tr>
+                <tr><td><code>logs/server.log</code></td><td>Rotating Flask log</td></tr>
+            </tbody>
+        </table>
+
+        <div class="note">
+            Still stuck? Open <a href="/logs">Server Logs</a> and copy the error message — it will contain the exact line of code that failed.
+        </div>
+    </div>
+
+</div><!-- /.main -->
+</body>
+</html>

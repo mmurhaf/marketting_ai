@@ -79,6 +79,10 @@ def view_logs():
 def help_page():
     return render_template('help.html')
 
+@app.route('/manual')
+def manual_page():
+    return render_template('manual.html')
+
 @app.route('/about')
 def about_page():
     readme_path = os.path.join(BASE_DIR, 'README.md')
@@ -115,6 +119,8 @@ def settings():
 
         data = {
             'image_source_url': (request.form.get('image_source_url') or '').strip(),
+            'scrape_limit': (request.form.get('scrape_limit') or '5').strip(),
+            'default_caption': (request.form.get('default_caption') or '').strip(),
             'instagram_username': (request.form.get('instagram_username') or '').strip(),
             'instagram_business_account_id': (request.form.get('instagram_business_account_id') or '').strip(),
             'facebook_page_id': (request.form.get('facebook_page_id') or '').strip(),
@@ -169,6 +175,47 @@ def api_test_facebook_token():
 
         # Example response: {"name": "...", "id": "..."}
         return jsonify({'success': True, 'message': 'Token is valid.', 'data': data})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/test/instagram', methods=['POST'])
+def api_test_instagram_credentials():
+    """Tests Instagram credentials via the Graph API using the Business Account ID + Facebook token."""
+    try:
+        config = load_config()
+        token = (config.get('facebook_access_token') or '').strip()
+        account_id = (config.get('instagram_business_account_id') or '').strip()
+
+        if not token:
+            return jsonify({'success': False, 'message': 'No Facebook access token configured. Instagram Graph API requires it.'})
+        if not account_id:
+            return jsonify({'success': False, 'message': 'No Instagram Business Account ID configured.'})
+
+        # Verify via Instagram Graph API
+        url = f'https://graph.facebook.com/v19.0/{account_id}'
+        resp = requests.get(url, params={'fields': 'id,name,username', 'access_token': token}, timeout=15)
+        data = resp.json()
+
+        if resp.status_code >= 400 or 'error' in data:
+            message = data.get('error', {}).get('message', 'Invalid credentials') if isinstance(data, dict) else 'Invalid credentials'
+            return jsonify({'success': False, 'message': message})
+
+        return jsonify({'success': True, 'message': 'Instagram credentials are valid.', 'data': data})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/test/tiktok', methods=['POST'])
+def api_test_tiktok_session():
+    """Checks whether a TikTok session ID is configured (cannot validate without full TikTok API integration)."""
+    try:
+        config = load_config()
+        session_id = (config.get('tiktok_session_id') or '').strip()
+        if not session_id:
+            return jsonify({'success': False, 'message': 'No TikTok session ID configured.'})
+        # Basic sanity: session IDs are typically long hex strings
+        if len(session_id) < 20:
+            return jsonify({'success': False, 'message': 'Session ID looks too short — please double-check it.'})
+        return jsonify({'success': True, 'message': f'Session ID is set ({len(session_id)} chars). Full validation requires TikTok API integration.'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
@@ -238,7 +285,7 @@ def get_music_list():
         if not os.path.exists(music_folder):
              return jsonify({'success': True, 'files': []})
              
-        files = [f for f in os.listdir(music_folder) if f.lower().endswith(('.mp3', '.wav'))]
+        files = [f for f in os.listdir(music_folder) if f.lower().endswith(('.mp3', '.wav', '.ogg'))]
         return jsonify({'success': True, 'files': files})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
@@ -318,13 +365,16 @@ def restart_server():
         
         def restart():
             import time
-            time.sleep(1) # Give time for response to flush
-            # Re-execute the current script with the same arguments
+            import subprocess
+            time.sleep(1)  # Give time for response to flush
             python = sys.executable
-            os.execl(python, python, *sys.argv)
+            # os.execl is unreliable on Windows (doesn't replace process).
+            # Instead, spawn a fresh process then exit the current one.
+            subprocess.Popen([python] + sys.argv)
+            os._exit(0)  # Hard exit current process without triggering atexit
 
         import threading
-        threading.Thread(target=restart).start()
+        threading.Thread(target=restart, daemon=True).start()
         
         return jsonify({'success': True, 'message': 'Server is restarting. Please wait 5-10 seconds then refresh.'})
     except Exception as e:
@@ -432,7 +482,8 @@ def api_editor_publish():
         if not media_files:
              return jsonify({'success': False, 'message': 'No media specified.'})
         
-        caption = data.get('caption', f"Check this out! #AleppoGift {datetime.date.today()}")
+        config = load_config()
+        caption = data.get('caption') or f"{config.get('default_caption', 'Check this out! #AleppoGift')} — {datetime.date.today()}"
         platforms = data.get('platforms', [])
         
         # Resolve paths
@@ -486,14 +537,18 @@ def run_scrape():
     try:
         config = load_config()
         url = config.get('image_source_url', "https://aleppogift.com/")
+        try:
+            scrape_limit = int(config.get('scrape_limit', 5))
+        except (ValueError, TypeError):
+            scrape_limit = 5
         scraper = ImageScraper(
             base_url=url,
             download_folder=IMAGES_DIR,
             history_file=os.path.join(BASE_DIR, 'data', 'history.json'),
             metadata_file=os.path.join(BASE_DIR, 'data', 'metadata.json')
         )
-        # Scrape up to 5 images
-        new_images = scraper.scrape(limit=5)
+        # Scrape up to configured limit
+        new_images = scraper.scrape(limit=scrape_limit)
         return jsonify({'success': True, 'message': f'Downloaded {len(new_images)} new images.', 'data': new_images})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
@@ -511,15 +566,15 @@ def run_create():
         
         if len(all_images) < 1:
             return jsonify({'success': False, 'message': 'Not enough images to create a reel.'})
-            
-            output_folder=OUTPUT_DIR,
-            metadata_file=os.path.join(BASE_DIR, 'data', 'metadata.json')
         
         # Take last 5 or random 5
         import random
         selected_images = random.sample(all_images, min(len(all_images), 5))
         
-        creator = ContentCreator()
+        creator = ContentCreator(
+            output_folder=OUTPUT_DIR,
+            metadata_file=os.path.join(BASE_DIR, 'data', 'metadata.json')
+        )
         video_path = creator.create_reel(selected_images, duration_per_image=3)
         
         if video_path:
@@ -541,12 +596,13 @@ def run_publish():
         if os.path.exists(OUTPUT_DIR):
             files = [os.path.join(OUTPUT_DIR, f) for f in os.listdir(OUTPUT_DIR) if f.endswith('.mp4')]
             if files:
-                latest_video = max(files, key=os.path.getctime)
+                latest_video = max(files, key=os.path.getmtime)
         
         if not latest_video:
              return jsonify({'success': False, 'message': 'No video found to publish.'})
-             
-        caption = f"Daily Update! #AleppoGift {datetime.date.today()}"
+
+        config = load_config()
+        caption = f"{config.get('default_caption', 'Daily Update! #AleppoGift')} — {datetime.date.today()}"
         
         # This is Simulation
         publisher.publish_to_instagram(latest_video, caption)

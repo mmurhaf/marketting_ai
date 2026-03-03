@@ -1,62 +1,138 @@
 # Marketing AI Agent
 
-This automatic agent scrapes images from [aleppogift.com](https://aleppogift.com/), creates video reels/stories, and simulates publishing them to social media.
+An automated social media marketing tool that scrapes product images from a configurable source URL, generates vertical video reels and carousel posts, and publishes them to Instagram, Facebook, and TikTok — all managed through a local web dashboard.
 
 ## Features
 
-- **Scraper**: Fetches new images from the website, checking for duplicates.
-- **Content Creator**: Generates MP4 video reels suitable for Instagram/TikTok/Facebook Stories (vertical 9:16).
-- **Editor & Uploader**: Web interface to upload your own local images and music, visualize reels, and customize content.
-- **Scheduler**: Runs automatically every day at 10:00 AM.
-- **Publisher**: (Simulation) Logs publishing events.
-- **Web Dashboard**: A user-friendly interface to manage settings, trigger tasks manually, restart the server, and view the gallery.
+- **Image Scraper** — Fetches new images from any configurable website, deduplicates via MD5 hashing, and stores metadata (title, alt text, source URL).
+- **Content Creator** — Generates 9:16 portrait MP4 reels (1080×1920) with optional background music, fade transitions, and text overlays. Also supports 1:1 carousel post images (1080×1080).
+- **Web Dashboard** — Full browser-based UI to trigger tasks, monitor live status, and restart the server.
+- **Editor** — Select images, pick background music, preview the result, choose platforms, and publish — all from the browser.
+- **Gallery** — Browse downloaded images and generated videos; delete or publish any asset with one click.
+- **Settings** — Configure the scrape URL, Instagram credentials (official Graph API or unofficial instagrapi), Facebook Page Access Token, and TikTok session ID. Secrets are stored server-side and never exposed in the UI.
+- **Server Logs** — View rotating Flask server logs directly in the browser.
+- **Auto-Music Tool** — Batch-add random background music to all silent videos in the output folder.
+- **Scheduler (headless mode)** — Runs the full pipeline automatically every day at 10:00 AM.
+
+## Project Structure
+
+```
+marketting_ai/
+├── src/
+│   ├── server.py          # Flask web server & all API routes
+│   ├── content_creator.py # Reel & post image generation (MoviePy + Pillow)
+│   ├── scraper.py         # Image scraper (requests + BeautifulSoup)
+│   ├── publisher.py       # Social media publisher (stub, ready to extend)
+│   ├── main.py            # Headless scheduled runner
+│   └── templates/         # Jinja2 HTML templates
+│       ├── dashboard.html
+│       ├── editor.html
+│       ├── gallery.html
+│       ├── settings.html
+│       ├── logs.html
+│       ├── help.html
+│       └── about.html
+├── assets/
+│   ├── images/            # Downloaded product images
+│   ├── music/             # Background music files (.mp3, .wav)
+│   └── output/            # Generated videos & post images
+├── data/
+│   ├── config.json        # Runtime configuration & credentials
+│   ├── history.json       # Hashes of already-downloaded images
+│   └── metadata.json      # Image metadata (title, description, source URL)
+├── logs/
+│   └── server.log         # Rotating Flask server log
+├── requirements.txt
+└── start_server.bat       # Double-click launcher (Windows)
+```
+
+## Requirements
+
+- Python 3.8+
+- Windows, Linux, or macOS
+- `ffmpeg` must be on your system PATH (required by MoviePy for video encoding)
+- *(Optional)* ImageMagick — needed only for `TextClip` in MoviePy
 
 ## Installation
 
-1.  **Install Python**: Ensure you have Python installed.
-2.  **Install Dependencies**:
-    ```bash
-    pip install -r requirements.txt
-    ```
-    *Note: `moviepy` may require ImageMagick installed on your system for some features.*
+1. **Clone the repository** and open a terminal in the project root.
+
+2. **Create a virtual environment** (recommended):
+   ```bash
+   python -m venv .venv
+   # Windows
+   .venv\Scripts\activate
+   # Linux / macOS
+   source .venv/bin/activate
+   ```
+
+3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ## Usage
 
 ### Option 1: Web Dashboard (Recommended)
 
-Start the web server to access the dashboard, editor, and settings:
+**Windows** — double-click `start_server.bat`. It opens the browser automatically.
 
+**Any OS** — run manually:
 ```bash
 python src/server.py
 ```
+Then open `http://localhost:5000` in your browser.
 
-Open your browser and navigate to `http://localhost:5000`. You can:
-- Run the scraper, creator, and publisher manually.
-- Upload local images and background music directly to the assets folder.
-- Edit settings (API keys, passwords).
-- View generated videos in the Gallery.
-- View this documentation live on the 'About' page.
+| Page | URL | Description |
+|---|---|---|
+| Dashboard | `/` | Trigger scrape, create, and publish; monitor live output |
+| Editor | `/editor` | Select images, add music, preview & publish |
+| Gallery | `/gallery` | Browse images and videos; delete or publish |
+| Settings | `/settings` | Configure credentials and source URL |
+| Server Logs | `/logs` | View real-time Flask logs |
+| Setup Guide | `/help` | Step-by-step credential setup for each platform |
+| About / Docs | `/about` | Renders this README live |
 
-### Option 2: Command Line (Headless)
-
-Run the main automation script:
+### Option 2: Headless / Scheduled
 
 ```bash
 python src/main.py
 ```
 
-The script will:
-1.  Run immediately once for testing.
-2.  Stay active and run every day at 10:00 AM.
+Runs once immediately, then repeats every day at **10:00 AM**. No web UI required.
 
 ## Configuration
 
-- **Scraping**: `src/scraper.py` looks for `<img>` tags. You can adjust filters there.
-- **Video**: `src/content_creator.py` sets the duration and resolution.
-- **Publishing**: `src/publisher.py` is currently a functional stub. To actually publish, you need to integrate a library like `instagrapi` or use official APIs with access tokens.
+All settings are saved to `data/config.json` via the Settings page. The following keys are used:
+
+| Key | Description |
+|---|---|
+| `image_source_url` | Website to scrape images from |
+| `instagram_username` | Instagram username (unofficial method) |
+| `instagram_password` | Instagram password (unofficial method, stored server-side) |
+| `instagram_business_account_id` | Business account ID for the official Graph API |
+| `facebook_page_id` | Facebook Page ID (numeric) |
+| `facebook_access_token` | Long-lived Page Access Token from Meta for Developers |
+| `tiktok_session_id` | TikTok `sessionid` cookie value (unofficial method) |
+
+> **Note:** Credentials are never sent back to the browser after saving. Use the **"Clear saved …"** checkboxes in Settings to remove them.
+
+## Adding Real Publishing
+
+`src/publisher.py` currently **simulates** all publishing (no real API calls). To go live:
+
+- **Instagram (Official)** — implement the [Instagram Graph API](https://developers.facebook.com/docs/instagram-api/) using `instagram_business_account_id` and `facebook_access_token`.
+- **Instagram (Unofficial)** — integrate [`instagrapi`](https://github.com/adw0rd/instagrapi) and use the stored username/password.
+- **Facebook** — use the [Facebook Graph API](https://developers.facebook.com/docs/graph-api/) with the page access token.
+- **TikTok (Unofficial)** — integrate [`TikTokApi`](https://github.com/davidteather/TikTok-Api) with the session ID.
 
 ## Output
 
-- **Images**: Downloaded to `assets/images`.
-- **Videos**: Generated in `assets/output`.
-- **History**: `data/history.json` tracks downloaded images to avoid reposting.
+| Location | Contents |
+|---|---|
+| `assets/images/` | Raw scraped images (named by MD5 hash) |
+| `assets/music/` | Uploaded background music files |
+| `assets/output/` | Generated reels (`reel_XXXX.mp4`) and post images |
+| `data/history.json` | Set of downloaded image hashes (prevents re-downloads) |
+| `data/metadata.json` | Title, description, and source URL for each image |
+| `logs/server.log` | Rotating server log (100 KB max, 1 backup) |

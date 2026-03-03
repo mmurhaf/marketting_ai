@@ -7,6 +7,7 @@ if not hasattr(PIL.Image, 'ANTIALIAS'):
 from moviepy.editor import ImageClip, concatenate_videoclips, CompositeVideoClip, ColorClip, TextClip, AudioFileClip, afx
 import os
 import random
+import textwrap
 from PIL import Image, ImageDraw, ImageFont
 
 class ContentCreator:
@@ -69,13 +70,24 @@ class ContentCreator:
                     )
                     img = Image.alpha_composite(img.convert('RGBA'), overlay)
                     
-                    # Draw text
+                    # Draw text with proper word-wrapping
                     draw = ImageDraw.Draw(img)
                     text_color = (255, 255, 255)
-                    
-                    # TODO: Wrap text if too long
-                    draw.text((50, target_size[1] - 250), title[:30], font=font_title, fill=text_color)
-                    draw.text((50, target_size[1] - 150), description[:50], font=font_desc, fill=text_color)
+                    max_text_width = target_size[0] - 100  # 50px margin on each side
+
+                    # Draw wrapped title (font size 60)
+                    title_lines = self._wrap_text(title, font_title, max_text_width)
+                    y_title = target_size[1] - 260
+                    for line in title_lines[:2]:  # max 2 lines for title
+                        draw.text((50, y_title), line, font=font_title, fill=text_color)
+                        y_title += 70
+
+                    # Draw wrapped description (font size 40)
+                    desc_lines = self._wrap_text(description, font_desc, max_text_width)
+                    y_desc = target_size[1] - 115
+                    for line in desc_lines[:2]:  # max 2 lines for description
+                        draw.text((50, y_desc), line, font=font_desc, fill=text_color)
+                        y_desc += 50
                 
                 # Save processed image to output
                 output_filename = f"post_{random.randint(1000, 9999)}_{filename}"
@@ -88,6 +100,33 @@ class ContentCreator:
                 print(f"Error processing image for post {img_path}: {e}")
 
         return processed_images
+
+    def _wrap_text(self, text, font, max_width):
+        """Wrap text to fit within max_width pixels, returning a list of lines."""
+        words = text.split()
+        lines = []
+        current_line = []
+
+        for word in words:
+            test_line = ' '.join(current_line + [word])
+            try:
+                # Pillow >= 9.2: use getlength; fall back to getsize for older versions
+                bbox = font.getbbox(test_line)
+                line_width = bbox[2] - bbox[0]
+            except AttributeError:
+                line_width, _ = font.getsize(test_line)
+
+            if line_width <= max_width:
+                current_line.append(word)
+            else:
+                if current_line:
+                    lines.append(' '.join(current_line))
+                current_line = [word]
+
+        if current_line:
+            lines.append(' '.join(current_line))
+
+        return lines if lines else [text]
 
     def _resize_fill(self, img, size):
         img_ratio = img.width / img.height
